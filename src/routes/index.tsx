@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SentimentChart } from "@/components/SentimentChart";
 import { Logo, ThemeToggle } from "@/components/app/primitives";
 import { cn } from "@/lib/utils";
+import { ClientOnly } from "@/components/ClientOnly";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,7 +30,7 @@ function Landing() {
             <a href="#pricing" className="hover:text-foreground">Pricing</a>
           </nav>
           <div className="flex items-center gap-2">
-            <span className="hidden sm:block"><ThemeToggle variant="header" /></span>
+            <span className="hidden sm:block"><ClientOnly fallback={<span className="block h-7 w-12" />}><ThemeToggle variant="header" /></ClientOnly></span>
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex"><Link to="/login" search={{ mode: "signin" }}>Sign in</Link></Button>
             <Button asChild size="sm"><Link to="/login" search={{ mode: "signup" }}>Start free trial</Link></Button>
           </div>
@@ -68,7 +69,7 @@ function Landing() {
               </Link>
             </div>
             <div className="rounded-xl bg-background p-3 md:p-5">
-              <SentimentChart />
+              <ClientOnly fallback={<div className="h-[300px]" />}><SentimentChart /></ClientOnly>
             </div>
           </div>
           <p className="mt-4 text-caption text-muted-foreground">No sign-up needed: the demo runs on sample data from 3 products.</p>

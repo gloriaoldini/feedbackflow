@@ -4,24 +4,18 @@ import { AlertTriangle, ArrowRight, Download, Lightbulb, MessagesSquare, Trendin
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BarList, EmptyState, KpiCard, PageHeader, SectionTitle } from "@/components/app/primitives";
-import { ChartLegend, NpsLine, SENTIMENT_LEGEND, SentimentBars } from "@/components/app/charts";
+import { ChartLegend, SENTIMENT_LEGEND, SentimentBars } from "@/components/app/charts";
 import { SendFeatureButton } from "@/components/app/SendControls";
 import { downloadCsv, sentimentSeries, useFeatures, useFeedback } from "@/lib/data";
 import { TOPIC_LABEL, type FeedbackItem, type Topic } from "@/lib/demo-data";
 import { useCurrentProject } from "@/lib/projects";
+import { useApp } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/insights")({
   head: () => ({ meta: [{ title: "Insights · FeedBackFlow" }] }),
   component: InsightsPage,
 });
 
-/** NPS comes from your survey tool; demo values per project. */
-const NPS: Record<string, number[]> = {
-  web: [32, 38, 41, 47, 52, 58],
-  mobile: [22, 25, 24, 30, 33, 36],
-  api: [40, 38, 41, 39, 44, 46],
-  "insights-hub": [18, 24, 27, 31, 30, 35],
-};
 const THEMES: Record<string, [string, number][]> = {
   web: [["Onboarding", 84], ["AI", 78], ["Performance", 67], ["Integrations", 63], ["Pricing", 52], ["Mobile", 41]],
   mobile: [["Onboarding", 72], ["Notifications", 58], ["Performance", 49], ["Offline", 38]],
@@ -58,7 +52,7 @@ function InsightsPage() {
     };
   }, [fb]);
 
-  const nps = NPS[project.id];
+  const sentCount = useApp((s) => Object.keys(s.sentFeatures).filter((id) => features.some((f) => f.id === id)).length + Object.keys(s.sent).filter((id) => fb.some((f) => f.id === id)).length);
   const themes = THEMES[project.id];
   const topFeature = features[0];
 
@@ -94,7 +88,7 @@ function InsightsPage() {
       <section aria-label="Key metrics" className="grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4">
         <KpiCard label="Feedback this week" value={fb.length} delta="↑ 24%" good note="vs last week" />
         <KpiCard label="Avg. sentiment" value={d.score} suffix=" / 5" delta="↑ 0.4" good note="vs last week" />
-        <KpiCard label="NPS" value={nps ? nps[nps.length - 1] : "—"} delta={nps ? `↑ ${nps[nps.length - 1] - nps[nps.length - 2]}` : "—"} good note="vs last week" />
+        <KpiCard label="Sent to Jira / Linear" value={sentCount} delta={sentCount ? `↑ ${sentCount}` : "→ 0"} good note="this week" />
         <KpiCard label="Urgent issues" value={d.open} delta="↓ 3" good note="vs last week" />
       </section>
 
@@ -122,17 +116,7 @@ function InsightsPage() {
         </Card>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
-        <Card className="flex min-w-0 flex-col gap-4 p-5 md:p-6">
-          <SectionTitle
-            title="NPS trend"
-            sub="6-week rolling average"
-            actions={nps && <span className="text-[24px] font-semibold tabular">{nps[5]} <span className="text-[12px] text-pos-fg">↑ {nps[5] - nps[4]}</span></span>}
-          />
-          {nps ? <NpsLine data={nps.map((v, i) => ({ week: `W${i + 1}`, nps: v }))} /> : (
-            <EmptyState icon={TrendingUp} title="No NPS data" body="Connect your survey tool to track NPS for this project." />
-          )}
-        </Card>
+      <section>
         <Card className="flex min-w-0 flex-col gap-4 p-5 md:p-6">
           <SectionTitle title="Theme health" sub="Score out of 100 · higher means happier customers" />
           {themes ? (

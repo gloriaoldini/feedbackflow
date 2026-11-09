@@ -6,7 +6,7 @@
 
 ## Try it
 
-- **Landing page:** `/`
+- **Landing page:** `/` (on GitHub Pages: `https://<your-user>.github.io/<repo>/`)
 - **Live demo:** `/demo`. No sign-up: it opens a demo workspace with sample data from 3 products (Web App, Mobile App, Public API) plus a second workspace (Northwind Labs).
 
 The demo is fully navigable. You can:
@@ -53,15 +53,28 @@ npm run build
 - **With** them, sign up / sign in uses Supabase auth, and feedback is read from the `feedback_items` and `feature_requests_aggregated` tables. The "Explore the live demo" button still works.
 - **Projects:** `supabase/migrations/20261108120000_projects.sql` adds the `projects` table, the `project_id` columns and RLS policies, and backfills one project per workspace.
 
-### Deploy
+### Deploy to GitHub Pages (portfolio demo)
 
-The repo is configured for Cloudflare (`wrangler.jsonc`):
+The repo includes `.github/workflows/deploy-pages.yml`. On every push to `main` it builds a static version (every route is prerendered) and publishes it.
+
+1. Push the repo to GitHub (e.g. `feedbackflow`).
+2. On GitHub, go to **Settings → Pages → Build and deployment → Source** and choose **GitHub Actions**.
+3. Push to `main` (or go to **Actions → Deploy to GitHub Pages → Run workflow**).
+4. The demo goes live at `https://<your-user>.github.io/<repo>/`. The direct demo link is `https://<your-user>.github.io/<repo>/demo`.
+
+To build locally the same way:
+
+```bash
+BASE_PATH=/feedbackflow/ npm run build:pages   # output: dist/client
+```
+
+The Pages build always runs in demo mode (no Supabase keys needed).
+
+### Deploy with a server (Cloudflare)
 
 ```bash
 npm run build && npx wrangler deploy
 ```
-
-It can also be published from Lovable. GitHub Pages is not suitable, because the app uses server-side rendering.
 
 ## Structure
 

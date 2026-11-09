@@ -3,7 +3,8 @@ import { Inbox, LayoutDashboard, LogOut, Plug, Settings, Sparkles } from "lucide
 import { supabase } from "@/integrations/supabase/client";
 import { isDemoMode, useFeedback } from "@/lib/data";
 import { store, useApp } from "@/lib/store";
-import { Avatar, Logo, ThemeToggle } from "@/components/app/primitives";
+import { Avatar, Logo, Skeleton, ThemeToggle } from "@/components/app/primitives";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ProjectSwitcher } from "@/components/app/ProjectSwitcher";
 
@@ -37,7 +38,26 @@ function useOpenCount() {
   return data.filter((f) => !archived.includes(f.id) && !addressed.includes(f.id)).length;
 }
 
+function useHydrated() {
+  const [h, setH] = useState(false);
+  useEffect(() => setH(true), []);
+  return h;
+}
+
+function PageSkeleton() {
+  return (
+    <div className="flex flex-col gap-6" aria-busy="true" aria-label="Loading">
+      <Skeleton className="h-16 w-2/3" />
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-32" />)}
+      </div>
+      <Skeleton className="h-72" />
+    </div>
+  );
+}
+
 function AppShell() {
+  const hydrated = useHydrated();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const name = useApp((s) => s.profileName);
@@ -130,7 +150,8 @@ function AppShell() {
 
       <div className="min-w-0 flex-1">
         <main className="mx-auto w-full max-w-[1200px] px-4 pb-28 pt-5 md:px-7 md:pb-12 md:pt-8 lg:px-10 lg:pt-10">
-          <Outlet />
+          {/* App pages show live, time-relative data: render them in the browser only. */}
+          {hydrated ? <Outlet /> : <PageSkeleton />}
         </main>
       </div>
 

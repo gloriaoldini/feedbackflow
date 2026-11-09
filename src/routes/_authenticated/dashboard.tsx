@@ -19,7 +19,7 @@ import { ChartLegend, SENTIMENT_LEGEND, SentimentBars } from "@/components/app/c
 import { SendFeatureButton, useSentFeatureCount } from "@/components/app/SendControls";
 import { Tour } from "@/components/app/Tour";
 import { sentimentSeries, useFeatures, useFeedback } from "@/lib/data";
-import { SOURCE_LABEL, TOPIC_LABEL, timeAgo, type FeedbackItem } from "@/lib/demo-data";
+import { TOPIC_LABEL, timeAgo, type FeedbackItem } from "@/lib/demo-data";
 import { useApp } from "@/lib/store";
 import { useCurrentProject } from "@/lib/projects";
 
@@ -67,7 +67,6 @@ function Dashboard() {
       dNeg: share(cur, "negative") - share(prev, "negative"),
       dUrgent: urgent(cur) - urgent(prev),
       series,
-      bySource: (["slack", "intercom", "gmail"] as const).map((s) => ({ label: SOURCE_LABEL[s], value: fb.filter((f) => f.source === s).length })),
       byTopic: Object.entries(
         fb.reduce<Record<string, number>>((acc, f) => ({ ...acc, [f.topic]: (acc[f.topic] ?? 0) + 1 }), {}),
       )
@@ -187,16 +186,10 @@ function Dashboard() {
         </ul>
       </Card>
 
-      <section className="grid gap-4 md:grid-cols-2">
-        <Card className="flex flex-col gap-5 p-5 md:p-6">
-          <SectionTitle title="By source" sub="Which channels drive feedback" />
-          <BarList rows={stats.bySource} color="var(--color-primary)" labelWidth={80} />
-        </Card>
-        <Card className="flex flex-col gap-5 p-5 md:p-6">
-          <SectionTitle title="By topic" sub="What customers talk about" />
-          <BarList rows={stats.byTopic} color="var(--color-chart-topic)" labelWidth={118} />
-        </Card>
-      </section>
+      <Card className="flex flex-col gap-5 p-5 md:p-6">
+        <SectionTitle title="By topic" sub="What customers talk about in this project" />
+        <BarList rows={stats.byTopic} color="var(--color-chart-topic)" labelWidth={118} />
+      </Card>
       </>)}
     </div>
   );

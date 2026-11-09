@@ -6,10 +6,30 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-// Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
-// @cloudflare/vite-plugin builds from this — wrangler.jsonc main alone is insufficient.
-export default defineConfig({
-  tanstackStart: {
-    server: { entry: "server" },
-  },
-});
+/**
+ * GitHub Pages build (static SPA, no server):
+ *   GITHUB_PAGES=true BASE_PATH=/<repo-name>/ npm run build
+ * Output: dist/client  (see .github/workflows/deploy-pages.yml)
+ * Without GITHUB_PAGES the default SSR build (Lovable / Cloudflare) is unchanged.
+ */
+const pages = process.env.GITHUB_PAGES === "true";
+const base = process.env.BASE_PATH || "/";
+
+export default defineConfig(
+  pages
+    ? {
+        nitro: false,
+        vite: { base },
+        tanstackStart: {
+          server: { entry: "server" },
+          // Every route is prerendered to its own index.html, so deep links load directly.
+          prerender: { enabled: true, crawlLinks: false },
+          pages: ["/", "/demo", "/login", "/onboarding", "/dashboard", "/inbox", "/insights", "/integrations", "/settings", "/projects/new"].map((path) => ({ path })),
+        },
+      }
+    : {
+        tanstackStart: {
+          server: { entry: "server" },
+        },
+      },
+);
