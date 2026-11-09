@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Building2, Check, ChevronsUpDown, Plus, Search, Settings2 } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, Search, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { COLOR_CLASS, WORKSPACES, switchProject, switchWorkspace, useCurrentProject, useProjects, useWorkspace, type Project } from "@/lib/projects";
-import { useApp } from "@/lib/store";
+import { COLOR_CLASS, switchProject, useCurrentProject, useProjects, type Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 
 export function ProjectMark({ project, size = 28, className }: { project: Pick<Project, "name" | "color">; size?: number; className?: string }) {
@@ -19,15 +18,13 @@ export function ProjectMark({ project, size = 28, className }: { project: Pick<P
   );
 }
 
-/** Switch product (project) and company (workspace). One product at a time, everywhere. */
+/** Switch product (project). One product at a time, everywhere. Workspaces live in Settings. */
 export function ProjectSwitcher({ variant }: { variant: "sidebar" | "rail" | "topbar" }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const navigate = useNavigate();
   const project = useCurrentProject();
-  const workspace = useWorkspace();
   const projects = useProjects();
-  const names = useApp((s) => s.workspaceNames);
   const shown = projects.filter((p) => p.name.toLowerCase().includes(q.toLowerCase()));
 
   const pick = (p: Project) => {
@@ -56,10 +53,7 @@ export function ProjectSwitcher({ variant }: { variant: "sidebar" | "rail" | "to
         ) : (
           <button className="flex w-full items-center gap-2.5 rounded-xl border border-transparent p-2 text-left transition-colors hover:border-border hover:bg-card focus-visible:outline-none focus-visible:focus-ring data-[state=open]:border-border data-[state=open]:bg-card">
             <ProjectMark project={project} size={32} />
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[14px] font-semibold leading-5">{project.name}</span>
-              <span className="block truncate text-caption text-muted-foreground">{workspace.name} · {workspace.plan}</span>
-            </span>
+            <span className="min-w-0 flex-1 truncate text-[14px] font-semibold leading-5">{project.name}</span>
             <ChevronsUpDown className="size-4 shrink-0 text-ink-subtle" aria-hidden="true" />
           </button>
         )}
@@ -84,7 +78,7 @@ export function ProjectSwitcher({ variant }: { variant: "sidebar" | "rail" | "to
           </div>
         </div>
         <div className="max-h-72 overflow-y-auto p-1.5">
-          <p className="px-2 pb-1 pt-1.5 text-overline text-muted-foreground">{workspace.name} projects</p>
+          <p className="px-2 pb-1 pt-1.5 text-overline text-muted-foreground">Your projects</p>
           {shown.map((p) => (
             <button
               key={p.id}
@@ -111,19 +105,6 @@ export function ProjectSwitcher({ variant }: { variant: "sidebar" | "rail" | "to
           </button>
         </div>
         <div className="border-t border-border p-1.5">
-          <p className="px-2 pb-1 pt-1.5 text-overline text-muted-foreground">Workspaces</p>
-          {WORKSPACES.map((w) => (
-            <button
-              key={w.id}
-              onClick={() => { switchWorkspace(w.id); setOpen(false); toast(`Switched to ${names[w.id] ?? w.name}`); }}
-              className="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-[13.5px] hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
-            >
-              <Building2 className="size-4 text-ink-subtle" aria-hidden="true" />
-              <span className="flex-1">{names[w.id] ?? w.name}</span>
-              <span className="text-caption text-muted-foreground">{w.plan}</span>
-              {w.id === workspace.id && <Check className="size-4 text-primary" aria-label="Current workspace" />}
-            </button>
-          ))}
           <Link
             to="/settings"
             search={{ tab: "projects" }}

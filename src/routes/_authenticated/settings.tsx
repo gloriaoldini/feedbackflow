@@ -13,7 +13,7 @@ import { ProjectMark } from "@/components/app/ProjectSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { isDemoMode } from "@/lib/data";
 import { DEMO_FEATURES, demoFeedback } from "@/lib/demo-data";
-import { COLOR_CLASS, PROJECT_COLORS, useCurrentProject, useProjects, useWorkspace, type Project } from "@/lib/projects";
+import { COLOR_CLASS, PROJECT_COLORS, WORKSPACES, switchWorkspace, useCurrentProject, useProjects, useWorkspace, type Project } from "@/lib/projects";
 import { store, useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -148,7 +148,9 @@ function WorkspaceTab() {
   const [name, setName] = useState(ws.name);
   const [s, setS] = useState(slug);
   useEffect(() => setName(ws.name), [ws.name]);
+  const names = useApp((st) => st.workspaceNames);
   return (
+    <>
     <Row title="Workspace" sub="Your company. Billing and members are shared by all its projects.">
       <Card className="flex flex-col gap-5 p-5 md:p-6">
         <div className="flex flex-col gap-1.5">
@@ -172,6 +174,24 @@ function WorkspaceTab() {
         </div>
       </Card>
     </Row>
+    <Row title="Switch workspace" sub="Only if you work for more than one company. Each workspace has its own projects and billing.">
+      <Card className="divide-y divide-border overflow-hidden">
+        {WORKSPACES.map((w) => (
+          <div key={w.id} className="flex items-center justify-between gap-4 p-4 md:px-6">
+            <div>
+              <p className="font-medium">{names[w.id] ?? w.name}</p>
+              <p className="text-caption text-muted-foreground">{w.plan} plan</p>
+            </div>
+            {w.id === ws.id ? (
+              <StatusTag tone="brand"><Check className="size-3" aria-hidden="true" /> Current</StatusTag>
+            ) : (
+              <Button variant="secondary" size="sm" onClick={() => { switchWorkspace(w.id); toast(`Switched to ${names[w.id] ?? w.name}`); }}>Switch</Button>
+            )}
+          </div>
+        ))}
+      </Card>
+    </Row>
+    </>
   );
 }
 

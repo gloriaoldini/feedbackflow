@@ -29,7 +29,7 @@ export function Tour() {
           One product at a <em className="serif-accent">time</em>
         </>
       ),
-      body: "Each product is a project with its own inbox, insights and Jira or Linear destination. Switch projects or workspaces from the top of the sidebar, or create one with + New project.",
+      body: "Each product is a project with its own inbox, insights and Jira or Linear destination. Switch projects from the top of the sidebar, or create one with + New project.",
       art: <ArtProjects />,
     },
     {
@@ -156,7 +156,7 @@ function ArtProjects() {
   ] as const;
   return (
     <div className={cn(mini, "flex w-full max-w-[300px] flex-col gap-0.5 p-2")}>
-      <span className="px-2 py-1 text-overline text-muted-foreground">Acme Inc projects</span>
+      <span className="px-2 py-1 text-overline text-muted-foreground">Your projects</span>
       {rows.map(([i, n, c, on]) => (
         <span key={n} className={cn("flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-[13px] font-medium", on && "bg-muted")}>
           <span className={cn("flex size-6 items-center justify-center rounded-md text-[11px] font-semibold text-white", c)}>{i}</span>
