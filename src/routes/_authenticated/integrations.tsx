@@ -80,7 +80,7 @@ function IntegrationsPage() {
     <div className="flex flex-col gap-8 animate-fade-up md:gap-9">
       <PageHeader title="Your" accent="integrations" sub={`Where ${project.name} feedback comes from, and where its requests go.`} />
 
-      <Card className="-mt-3 p-4 md:p-5" aria-label="Feedback flow for this project">
+      <Card className="-mt-3 p-4 md:p-5" aria-label="Feedback flow for this product">
         <div className="flex flex-col items-stretch gap-3 md:flex-row md:items-center">
           <FlowBox over="Sources" title={`${onSources.length} of 3 connected`} sub={onSources.map((s) => INTEGRATIONS[s].name).join(", ") || "None yet"} />
           <ArrowRight className="size-5 shrink-0 self-center text-ink-subtle max-md:rotate-90" aria-hidden="true" />

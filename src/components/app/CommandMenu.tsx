@@ -89,16 +89,16 @@ export function CommandMenu() {
             </CommandItem>
           ))}
         </CommandGroup>
-        <CommandGroup heading="Switch project">
+        <CommandGroup heading="Switch product">
           {projects.map((p) => (
-            <CommandItem key={p.id} value={`project ${p.name}`} onSelect={() => go(() => switchProject(p.id))}>
+            <CommandItem key={p.id} value={`product ${p.name}`} onSelect={() => go(() => switchProject(p.id))}>
               <ProjectMark project={p} size={20} />
               <span className="flex-1">{p.name}</span>
               {p.id === current.id && <span className="text-caption text-muted-foreground">Current</span>}
             </CommandItem>
           ))}
-          <CommandItem value="new project create" onSelect={() => go(() => navigate({ to: "/projects/new" }))}>
-            <FolderPlus /> New project
+          <CommandItem value="new product create" onSelect={() => go(() => navigate({ to: "/projects/new" }))}>
+            <FolderPlus /> New product
           </CommandItem>
         </CommandGroup>
         <CommandGroup heading="Actions">

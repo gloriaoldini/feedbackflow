@@ -12,11 +12,11 @@ import { useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/projects/new")({
-  head: () => ({ meta: [{ title: "New project · FeedBackFlow" }] }),
+  head: () => ({ meta: [{ title: "New product · FeedBackFlow" }] }),
   component: NewProject,
 });
 
-const STEPS = ["Project", "Sources", "Destination", "Done"];
+const STEPS = ["Product", "Sources", "Destination", "Done"];
 
 function NewProject() {
   const navigate = useNavigate();
@@ -54,10 +54,10 @@ function NewProject() {
 
       <header className="flex flex-col gap-1.5">
         <h1 className="text-h1-sm md:text-h1">
-          {step === 3 ? <>You're <em className="serif-accent">ready</em></> : <>New <em className="serif-accent">project</em></>}
+          {step === 3 ? <>You're <em className="serif-accent">ready</em></> : <>New <em className="serif-accent">product</em></>}
         </h1>
         <p className="text-muted-foreground">
-          {step === 3 ? "Feedback will start flowing into this project within a few minutes." : "A project is one product, with its own inbox, insights and Jira or Linear destination."}
+          {step === 3 ? "Feedback will start flowing into this product within a few minutes." : "Add a product you want to monitor (a website, an app, a piece of software), with its own inbox, insights and Jira or Linear destination."}
         </p>
       </header>
 
@@ -78,12 +78,12 @@ function NewProject() {
             <div className="flex items-center gap-4">
               <ProjectMark project={{ name: name || "?", color }} size={48} />
               <div className="flex-1">
-                <p className="text-h3">{name || "Project name"}</p>
+                <p className="text-h3">{name || "Product name"}</p>
                 <p className="text-caption text-muted-foreground">{names[workspaceId] ?? WORKSPACES.find((w) => w.id === workspaceId)?.name}</p>
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="p-name" className="text-[13px] font-medium">Project name</label>
+              <label htmlFor="p-name" className="text-[13px] font-medium">Product name</label>
               <Input id="p-name" autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Checkout, Mobile App, Admin Portal" maxLength={40} />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -126,7 +126,7 @@ function NewProject() {
           <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-h2">Connect sources</h2>
-              <p className="text-muted-foreground">Choose where {name}'s feedback comes from. Each source can feed several projects through its own channels, tags or address.</p>
+              <p className="text-muted-foreground">Choose where {name}'s feedback comes from. Each source can feed several products through its own channels, tags or address.</p>
             </div>
             {(["slack", "intercom", "gmail"] as const).map((s) => {
               const on = cfg.connected[s];
@@ -223,7 +223,7 @@ function NewProject() {
         {step === 1 && (
           <Button size="lg" onClick={() => setStep(2)}>{sourcesOn.length ? "Continue" : "Skip for now"} <ArrowRight /></Button>
         )}
-        {step === 2 && <Button size="lg" onClick={finish}>Create project</Button>}
+        {step === 2 && <Button size="lg" onClick={finish}>Create product</Button>}
         {step === 3 && <Button size="lg" onClick={() => navigate({ to: "/dashboard" })}>Go to {name} <ArrowRight /></Button>}
       </div>
     </div>

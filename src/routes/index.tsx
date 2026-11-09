@@ -86,7 +86,7 @@ function Landing() {
         </div>
         <ol className="grid gap-4 md:grid-cols-3">
           {[
-            { icon: MessageCircle, title: "Collect", body: "Connect Slack channels, Intercom tags and a Gmail address. Every product gets its own project and inbox." },
+            { icon: MessageCircle, title: "Collect", body: "Connect Slack channels, Intercom tags and a Gmail address. Every product gets its own inbox." },
             { icon: Sparkles, title: "Understand", body: "AI labels each message by sentiment, topic and urgency, then groups recurring asks into ranked requests." },
             { icon: Send, title: "Ship", body: "Review the AI summary, edit if needed and send it to Jira or Linear with a link back to the customer." },
           ].map((s, i) => (
@@ -117,7 +117,7 @@ function Landing() {
               { icon: TrendingUp, title: "AI sentiment analysis", desc: "Every message is tagged with sentiment, topic and urgency in seconds, so you see what's on fire at a glance." },
               { icon: Sparkles, title: "Top feature requests", desc: "Similar asks are grouped and ranked by mentions. Send any of them to your tracker straight from the list." },
               { icon: Hash, title: "Slack, Intercom & email", desc: "One inbox for everything customers say, from every channel, with replies sent back where they came from." },
-              { icon: FolderKanban, title: "One project per product", desc: "Running several products? Each gets its own inbox, insights and Jira or Linear destination. Switch in one click." },
+              { icon: FolderKanban, title: "One inbox per product", desc: "Running several products? Each gets its own inbox, insights and Jira or Linear destination. Switch in one click." },
             ].map((f) => (
               <div key={f.title} className="flex gap-4 rounded-2xl border border-border bg-card p-6 shadow-card">
                 <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted text-ink-2"><f.icon className="size-5" aria-hidden="true" /></span>
@@ -147,9 +147,9 @@ function Landing() {
         </div>
         <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-3">
           {[
-            { name: "Starter", price: 49, features: ["1 project", "1 source", "500 feedback / mo", "Basic AI analysis", "Email support"] },
-            { name: "Pro", price: 99, popular: true, features: ["5 projects", "3 sources", "5,000 feedback / mo", "Advanced AI", "Jira & Linear export", "Priority support"] },
-            { name: "Business", price: 299, features: ["Unlimited projects", "Unlimited sources", "Unlimited feedback", "Custom AI prompts", "SAML SSO", "Dedicated CSM"] },
+            { name: "Starter", price: 49, features: ["1 product", "1 source", "500 feedback / mo", "Basic AI analysis", "Email support"] },
+            { name: "Pro", price: 99, popular: true, features: ["5 products", "3 sources", "5,000 feedback / mo", "Advanced AI", "Jira & Linear export", "Priority support"] },
+            { name: "Business", price: 299, features: ["Unlimited products", "Unlimited sources", "Unlimited feedback", "Custom AI prompts", "SAML SSO", "Dedicated CSM"] },
           ].map((t) => (
             <div key={t.name} className={cn("relative flex flex-col rounded-2xl border bg-card p-7 shadow-card", t.popular ? "border-primary shadow-[0_0_0_3px_oklch(0.586_0.192_20/0.12)]" : "border-border")}>
               {t.popular && <span className="absolute -top-3 left-7 rounded-full bg-primary bg-button px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-white">Most popular</span>}

@@ -96,7 +96,7 @@ function OnboardingPage() {
             <div className="flex flex-col gap-6 animate-fade-up">
               <div className="text-center">
                 <h1 className="text-h1-sm md:text-h1">Connect your <em className="serif-accent">first source</em></h1>
-                <p className="mt-2 text-muted-foreground">Feedback will flow into <b className="font-semibold text-foreground">{project.name}</b>, your first project. Connect at least one source to continue.</p>
+                <p className="mt-2 text-muted-foreground">Feedback will flow into <b className="font-semibold text-foreground">{project.name}</b>, your first product. Connect at least one source to continue.</p>
               </div>
               <div className="flex flex-col gap-3">
                 {SOURCES.map((s) => {

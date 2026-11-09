@@ -26,14 +26,14 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-const LABEL: Record<Tab, string> = { profile: "Profile", workspace: "Workspace", projects: "Projects", notifications: "Notifications", appearance: "Appearance", billing: "Billing" };
+const LABEL: Record<Tab, string> = { profile: "Profile", workspace: "Workspace", projects: "Products", notifications: "Notifications", appearance: "Appearance", billing: "Billing" };
 
 function SettingsPage() {
   const { tab = "profile" } = Route.useSearch();
   const navigate = useNavigate({ from: "/settings" });
   return (
     <div className="mx-auto flex w-full max-w-[1000px] flex-col gap-6 animate-fade-up">
-      <PageHeader title="Your" accent="settings" sub="Manage your profile, workspace, projects and billing." />
+      <PageHeader title="Your" accent="settings" sub="Manage your profile, workspace, products and billing." />
       <Segmented label="Settings sections" value={tab} onChange={(t) => navigate({ search: { tab: t } })} items={TABS.map((t) => ({ value: t, label: LABEL[t] }))} />
       <div className="flex flex-col">
         {tab === "profile" && <ProfileTab />}
@@ -151,7 +151,7 @@ function WorkspaceTab() {
   const names = useApp((st) => st.workspaceNames);
   return (
     <>
-    <Row title="Workspace" sub="Your company. Billing and members are shared by all its projects.">
+    <Row title="Workspace" sub="Your team or company. It holds all the products you monitor (website, app, software…) and shares billing and members.">
       <Card className="flex flex-col gap-5 p-5 md:p-6">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="ws" className="text-[13px] font-medium">Workspace name</label>
@@ -174,7 +174,7 @@ function WorkspaceTab() {
         </div>
       </Card>
     </Row>
-    <Row title="Switch workspace" sub="Only if you work for more than one company. Each workspace has its own projects and billing.">
+    <Row title="Switch workspace" sub="Only if you work for more than one company. Each workspace has its own products and billing.">
       <Card className="divide-y divide-border overflow-hidden">
         {WORKSPACES.map((w) => (
           <div key={w.id} className="flex items-center justify-between gap-4 p-4 md:px-6">
@@ -203,7 +203,7 @@ function ProjectsTab() {
   const [archiving, setArchiving] = useState<Project | null>(null);
 
   return (
-    <Row title="Projects" sub={`Products in ${ws.name}. Each one has its own inbox, insights, sources and destination.`}>
+    <Row title="Products" sub={`What you monitor in ${ws.name}: each product has its own inbox, insights, sources and destination.`}>
       <div className="flex flex-col gap-3">
         <Card className="divide-y divide-border overflow-hidden">
           {projects.map((p) => (
@@ -221,7 +221,7 @@ function ProjectsTab() {
           ))}
         </Card>
         <Button asChild variant="secondary" className="self-start">
-          <Link to="/projects/new"><Plus /> New project</Link>
+          <Link to="/projects/new"><Plus /> New product</Link>
         </Button>
       </div>
       {editing && <EditProjectDialog project={editing} onClose={() => setEditing(null)} />}
@@ -259,7 +259,7 @@ function EditProjectDialog({ project, onClose }: { project: Project; onClose: ()
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit project</DialogTitle>
+          <DialogTitle>Edit product</DialogTitle>
           <DialogDescription>Changes are visible to everyone in the workspace.</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
@@ -287,7 +287,7 @@ function EditProjectDialog({ project, onClose }: { project: Project; onClose: ()
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
           <Button disabled={!name.trim()} onClick={() => {
             store.set((s) => ({ projectOverrides: { ...s.projectOverrides, [project.id]: { name: name.trim(), description: description.trim(), color } } }));
-            toast.success("Project updated");
+            toast.success("Product updated");
             onClose();
           }}>Save</Button>
         </DialogFooter>
@@ -297,7 +297,7 @@ function EditProjectDialog({ project, onClose }: { project: Project; onClose: ()
 }
 
 const NOTIFS = [
-  ["digest", "Weekly digest", "A summary of top insights for each project every Monday."],
+  ["digest", "Weekly digest", "A summary of top insights for each product every Monday."],
   ["urgent", "Urgent alerts", "Email me when a spike of urgent issues is detected."],
   ["trending", "New feature requests", "Tell me when a new theme starts trending."],
 ] as const;
@@ -325,7 +325,7 @@ function NotificationsTab() {
       </Card>
     </Row>
     {n.digest && (
-      <Row title="Weekly digest" sub="One email per workspace with every project's numbers, top request and what needs attention.">
+      <Row title="Weekly digest" sub="One email per workspace with every product's numbers, top request and what needs attention.">
         <Card className="flex flex-col gap-4 p-5 md:flex-row md:items-end md:justify-between md:p-6">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="digest-day" className="text-[13px] font-medium">Send it every</label>
@@ -365,7 +365,7 @@ function DigestPreview({ open, onOpenChange, day }: { open: boolean; onOpenChang
         <div className="flex flex-col gap-4 rounded-xl border border-border bg-background p-4 md:p-5">
           <p className="text-overline text-muted-foreground">FeedBackFlow · {ws.name}</p>
           <p className="text-h2">Your week in <em className="serif-accent">feedback</em></p>
-          <p className="text-muted-foreground">Hi {name.split(" ")[0]}, here's what customers said across {rows.length} {rows.length === 1 ? "project" : "projects"}.</p>
+          <p className="text-muted-foreground">Hi {name.split(" ")[0]}, here's what customers said across {rows.length} {rows.length === 1 ? "product" : "products"}.</p>
           <ul className="flex flex-col gap-2">
             {rows.map(({ p, n, pos, urgent, top }) => (
               <li key={p.id} className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3.5">
@@ -429,7 +429,7 @@ function BillingTab() {
       </Row>
       <Row title="Usage this month" sub="Resets on the 1st.">
         <Card className="flex flex-col gap-4 p-5 md:p-6">
-          {[["Feedback ingested", 2184, 5000], ["AI analyses", 892, 2500], ["Projects", projects.length, ws.plan === "Pro" ? 5 : 2]].map(([l, v, max]) => (
+          {[["Feedback ingested", 2184, 5000], ["AI analyses", 892, 2500], ["Products", projects.length, ws.plan === "Pro" ? 5 : 2]].map(([l, v, max]) => (
             <div key={l as string} className="flex flex-col gap-2">
               <div className="flex justify-between"><span className="font-medium">{l}</span><span className="tabular text-muted-foreground">{(v as number).toLocaleString()} / {(max as number).toLocaleString()}</span></div>
               <span className="h-2 overflow-hidden rounded-full bg-muted"><span className="block h-full rounded-full bg-primary" style={{ width: `${Math.min(100, ((v as number) / (max as number)) * 100)}%` }} /></span>

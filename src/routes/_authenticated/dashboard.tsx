@@ -187,7 +187,7 @@ function Dashboard() {
       </Card>
 
       <Card className="flex flex-col gap-5 p-5 md:p-6">
-        <SectionTitle title="By topic" sub="What customers talk about in this project" />
+        <SectionTitle title="By topic" sub="What customers talk about in this product" />
         <BarList rows={stats.byTopic} color="var(--color-chart-topic)" labelWidth={118} />
       </Card>
       </>)}

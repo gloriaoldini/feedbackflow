@@ -38,14 +38,14 @@ export function ProjectSwitcher({ variant }: { variant: "sidebar" | "rail" | "to
       <PopoverTrigger asChild>
         {variant === "rail" ? (
           <button
-            aria-label={`Project: ${project.name}. Switch project`}
-            title={`${project.name} · switch project`}
+            aria-label={`Product: ${project.name}. Switch product`}
+            title={`${project.name} · switch product`}
             className="rounded-lg focus-visible:outline-none focus-visible:focus-ring"
           >
             <ProjectMark project={project} size={36} />
           </button>
         ) : variant === "topbar" ? (
-          <button className="flex min-w-0 items-center gap-2 rounded-lg py-1 pr-1.5 focus-visible:outline-none focus-visible:focus-ring" aria-label={`Project: ${project.name}. Switch project`}>
+          <button className="flex min-w-0 items-center gap-2 rounded-lg py-1 pr-1.5 focus-visible:outline-none focus-visible:focus-ring" aria-label={`Product: ${project.name}. Switch product`}>
             <ProjectMark project={project} size={28} />
             <span className="truncate text-[15px] font-semibold">{project.name}</span>
             <ChevronsUpDown className="size-4 shrink-0 text-ink-subtle" aria-hidden="true" />
@@ -67,18 +67,18 @@ export function ProjectSwitcher({ variant }: { variant: "sidebar" | "rail" | "to
         <div className="border-b border-border p-2">
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-ink-subtle" aria-hidden="true" />
-            <label htmlFor="project-search" className="sr-only">Find a project</label>
+            <label htmlFor="project-search" className="sr-only">Find a product</label>
             <input
               id="project-search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Find a project…"
+              placeholder="Find a product…"
               className="h-9 w-full rounded-lg bg-muted pl-8 pr-3 text-[14px] placeholder:text-ink-subtle focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
         </div>
         <div className="max-h-72 overflow-y-auto p-1.5">
-          <p className="px-2 pb-1 pt-1.5 text-overline text-muted-foreground">Your projects</p>
+          <p className="px-2 pb-1 pt-1.5 text-overline text-muted-foreground">Your products</p>
           {shown.map((p) => (
             <button
               key={p.id}
@@ -90,10 +90,10 @@ export function ProjectSwitcher({ variant }: { variant: "sidebar" | "rail" | "to
                 <span className="block truncate text-[14px] font-medium">{p.name}</span>
                 {p.description && <span className="block truncate text-caption text-muted-foreground">{p.description}</span>}
               </span>
-              {p.id === project.id && <Check className="size-4 text-primary" aria-label="Current project" />}
+              {p.id === project.id && <Check className="size-4 text-primary" aria-label="Current product" />}
             </button>
           ))}
-          {shown.length === 0 && <p className="px-2 py-3 text-caption text-muted-foreground">No project matches “{q}”.</p>}
+          {shown.length === 0 && <p className="px-2 py-3 text-caption text-muted-foreground">No product matches “{q}”.</p>}
           <button
             onClick={() => { setOpen(false); navigate({ to: "/projects/new" }); }}
             className="mt-0.5 flex w-full items-center gap-2.5 rounded-lg p-2 text-left text-[14px] font-medium text-primary-ink hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
@@ -101,7 +101,7 @@ export function ProjectSwitcher({ variant }: { variant: "sidebar" | "rail" | "to
             <span className="flex size-7 items-center justify-center rounded-lg border border-dashed border-border-hover">
               <Plus className="size-4" aria-hidden="true" />
             </span>
-            New project
+            New product
           </button>
         </div>
         <div className="border-t border-border p-1.5">
@@ -111,7 +111,7 @@ export function ProjectSwitcher({ variant }: { variant: "sidebar" | "rail" | "to
             onClick={() => setOpen(false)}
             className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-[13.5px] text-ink-3 hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
           >
-            <Settings2 className="size-4 text-ink-subtle" aria-hidden="true" /> Manage projects
+            <Settings2 className="size-4 text-ink-subtle" aria-hidden="true" /> Manage products
           </Link>
         </div>
       </PopoverContent>

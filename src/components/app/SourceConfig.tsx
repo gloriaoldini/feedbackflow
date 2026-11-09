@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export const INTEGRATIONS: Record<IntegrationId, { name: string; desc: string; icon: React.ElementType; kind: "source" | "dest" | "more" }> = {
   slack: { name: "Slack", desc: "Pull feedback from the channels you choose.", icon: Hash, kind: "source" },
   intercom: { name: "Intercom", desc: "Sync conversations and tickets with a tag.", icon: MessageCircle, kind: "source" },
-  gmail: { name: "Gmail", desc: "Forward customer emails to a project address.", icon: Mail, kind: "source" },
+  gmail: { name: "Gmail", desc: "Forward customer emails to a product address.", icon: Mail, kind: "source" },
   jira: { name: "Jira", desc: "Create issues from AI summaries, with a link back to the message.", icon: Ticket, kind: "dest" },
   linear: { name: "Linear", desc: "Create Linear issues from feedback, labelled by topic.", icon: CircleCheckBig, kind: "dest" },
   github: { name: "GitHub", desc: "Open issues in any repository.", icon: GitBranch, kind: "more" },
@@ -45,7 +45,7 @@ export function SourceFields({
   if (id === "slack") {
     return (
       <fieldset className="flex flex-col gap-2">
-        <legend className="mb-2 text-[13px] font-medium">Channels that feed this project</legend>
+        <legend className="mb-2 text-[13px] font-medium">Channels that feed this product</legend>
         <div className="flex flex-wrap gap-2">
           {SLACK_CHANNELS.map((c) => {
             const on = routing.slackChannels.includes(c);
@@ -68,7 +68,7 @@ export function SourceFields({
             );
           })}
         </div>
-        <p className="text-caption text-muted-foreground">Messages posted in these channels are added to this project only.</p>
+        <p className="text-caption text-muted-foreground">Messages posted in these channels are added to this product only.</p>
       </fieldset>
     );
   }
@@ -77,7 +77,7 @@ export function SourceFields({
       <div className="flex flex-col gap-1.5">
         <label htmlFor="ic-tag" className="text-[13px] font-medium">Intercom tag</label>
         <Input id="ic-tag" value={routing.intercomTag} onChange={(e) => onChange({ ...routing, intercomTag: e.target.value.toLowerCase().replace(/\s+/g, "-") })} placeholder="e.g. mobile" />
-        <p className="text-caption text-muted-foreground">Conversations with this tag are routed to this project.</p>
+        <p className="text-caption text-muted-foreground">Conversations with this tag are routed to this product.</p>
       </div>
     );
   }
@@ -117,7 +117,7 @@ export function DestinationFields({ id, value, onChange }: { id: "jira" | "linea
         onChange={(e) => onChange(id === "jira" ? e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 10) : e.target.value)}
         placeholder={id === "jira" ? "e.g. WEB" : "e.g. Mobile"}
       />
-      <p className="text-caption text-muted-foreground">New issues from this project are created {id === "jira" ? "in this Jira project" : "for this Linear team"}.</p>
+      <p className="text-caption text-muted-foreground">New issues from this product are created {id === "jira" ? "in this Jira project" : "for this Linear team"}.</p>
     </div>
   );
 }
