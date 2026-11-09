@@ -24,7 +24,7 @@ export default defineConfig(
           server: { entry: "server" },
           // Every route is prerendered to its own index.html, so deep links load directly.
           prerender: { enabled: true, crawlLinks: false },
-          pages: ["/", "/demo", "/login", "/onboarding", "/dashboard", "/inbox", "/insights", "/integrations", "/settings", "/projects/new"].map((path) => ({ path })),
+          pages: ["/", "/demo", "/login", "/onboarding", "/dashboard", "/inbox", "/insights", "/integrations", "/settings", "/projects/new", "/join"].map((path) => ({ path })),
         },
       }
     : {

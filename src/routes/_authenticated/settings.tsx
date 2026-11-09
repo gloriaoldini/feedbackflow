@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { Check, Lock, Plus, UserPlus, X } from "lucide-react";
+import { Check, Link2, Lock, Plus, UserPlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,9 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, PageHeader, Segmented, StatusTag, useTheme } from "@/components/app/primitives";
 import { ProjectMark } from "@/components/app/ProjectSwitcher";
+import { NativeSelect } from "@/components/app/NativeSelect";
+import { InviteDialog, InviteEmailPreview, setTeamMembers } from "@/components/app/Invite";
 import { supabase } from "@/integrations/supabase/client";
 import { isDemoMode } from "@/lib/data";
-import { DEMO_FEATURES, demoFeedback } from "@/lib/demo-data";
+import { DEMO_FEATURES, demoFeedback, timeAgoLong } from "@/lib/demo-data";
 import { COLOR_CLASS, PROJECT_COLORS, useCurrentProject, useProjects, useWorkspace, type Project } from "@/lib/projects";
 import { store, useApp, type Member } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -150,11 +152,12 @@ function WorkspaceTab() {
   const products = useProjects();
   const [name, setName] = useState(ws.name);
   const [s, setS] = useState(slug);
-  const [invite, setInvite] = useState("");
-  const [role, setRole] = useState<Member["role"]>("Member");
+  const [inviting, setInviting] = useState(false);
+  const [preview, setPreview] = useState<Member | null>(null);
   useEffect(() => setName(ws.name), [ws.name]);
-  const validInvite = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(invite.trim());
-  const setMembers = (fn: (m: Member[]) => Member[]) => store.set((st) => ({ members: { ...st.members, [ws.id]: fn(st.members[ws.id] ?? []) } }));
+  const setMembers = (fn: (m: Member[]) => Member[]) => setTeamMembers(ws.id, fn);
+  const active = members.filter((m) => !m.pending);
+  const pending = members.filter((m) => m.pending);
 
   return (
     <>
@@ -183,60 +186,51 @@ function WorkspaceTab() {
         </Card>
       </Row>
 
-      <Row title="Members" sub="Everyone here sees all the team's products. Admins can add products, connect integrations and manage billing.">
+      <Row title="Members" sub="Everyone here sees all the team's products. Admins can also add products, connect integrations, invite people and manage billing.">
         <Card className="overflow-hidden">
-          <form
-            className="flex flex-col gap-2 border-b border-border p-4 sm:flex-row sm:items-end md:px-6"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!validInvite) return;
-              const email = invite.trim().toLowerCase();
-              if (members.some((m) => m.email === email)) { toast("Already in the team"); return; }
-              setMembers((m) => [...m, { id: `m-${Date.now()}`, name: email.split("@")[0], email, role, pending: true }]);
-              setInvite("");
-              toast.success(`Invite sent to ${email}`);
-            }}
-          >
-            <div className="flex flex-1 flex-col gap-1.5">
-              <label htmlFor="invite" className="text-[13px] font-medium">Invite by email</label>
-              <Input id="invite" type="email" placeholder="colleague@company.com" value={invite} onChange={(e) => setInvite(e.target.value)} />
-            </div>
-            <div className="flex gap-2">
-              <label htmlFor="invite-role" className="sr-only">Role</label>
-              <select id="invite-role" value={role} onChange={(e) => setRole(e.target.value as Member["role"])}
-                className="h-10 rounded-lg border border-input bg-card px-3 text-[14px] hover:border-border-hover focus:border-primary focus:outline-none">
-                <option>Member</option><option>Admin</option>
-              </select>
-              <Button type="submit" className="h-10" disabled={!validInvite}><UserPlus /> Invite</Button>
-            </div>
-          </form>
+          <div className="flex flex-wrap items-center gap-2 border-b border-border p-4 md:px-6">
+            <p className="flex-1 text-[14px] font-medium">
+              {active.length} {active.length === 1 ? "member" : "members"}
+              {pending.length > 0 && <span className="font-normal text-muted-foreground"> · {pending.length} invite{pending.length === 1 ? "" : "s"} pending</span>}
+            </p>
+            <Button variant="secondary" size="sm" onClick={() => { navigator.clipboard?.writeText(`${window.location.origin}${import.meta.env.BASE_URL}join?team=${ws.id}`); toast.success("Invite link copied", { description: "Anyone with the link can ask to join. You approve them here." }); }}>
+              <Link2 /> Copy invite link
+            </Button>
+            <Button size="sm" onClick={() => setInviting(true)}><UserPlus /> Invite people</Button>
+          </div>
           <ul className="divide-y divide-border">
-            {members.map((m) => {
+            {[...active, ...pending].map((m) => {
               const you = m.email === myEmail;
               return (
-                <li key={m.id} className="flex items-center gap-3 px-4 py-3 md:px-6">
-                  <Avatar name={m.name} size={34} brand={you} />
+                <li key={m.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 md:px-6">
+                  <Avatar name={m.pending ? m.email : m.name} size={34} brand={you} />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{m.name}{you && <span className="font-normal text-muted-foreground"> (you)</span>}</p>
-                    <p className="truncate text-caption text-muted-foreground">{m.email}</p>
+                    <p className="truncate font-medium">{m.pending ? m.email : m.name}{you && <span className="font-normal text-muted-foreground"> (you)</span>}</p>
+                    <p className="truncate text-caption text-muted-foreground">
+                      {m.pending ? <>Invite sent{m.invitedAt ? ` ${timeAgoLong(m.invitedAt)}` : ""} · waiting to accept</> : m.email}
+                    </p>
                   </div>
-                  {m.pending && <span className="hidden h-[22px] items-center rounded-full border border-neu-bd bg-neu-bg px-2 text-[12px] font-medium text-neu-fg sm:inline-flex">Invite sent</span>}
+                  {m.pending && (
+                    <span className="flex gap-1">
+                      <Button variant="ghost" size="sm" onClick={() => setPreview(m)}>Preview</Button>
+                      <Button variant="ghost" size="sm" onClick={() => { setMembers((l) => l.map((x) => (x.id === m.id ? { ...x, invitedAt: new Date().toISOString() } : x))); toast.success(`Invite sent again to ${m.email}`); }}>Resend</Button>
+                    </span>
+                  )}
                   {you ? (
                     <span className="text-[13px] text-muted-foreground">{m.role}</span>
                   ) : (
-                    <>
-                      <label htmlFor={`role-${m.id}`} className="sr-only">Role of {m.name}</label>
-                      <select id={`role-${m.id}`} value={m.role} onChange={(e) => setMembers((list) => list.map((x) => (x.id === m.id ? { ...x, role: e.target.value as Member["role"] } : x)))}
-                        className="h-8 rounded-md border border-input bg-card px-2 text-[13px] hover:border-border-hover focus:border-primary focus:outline-none">
+                    <span className="flex items-center gap-1">
+                      <label htmlFor={`role-${m.id}`} className="sr-only">Role of {m.pending ? m.email : m.name}</label>
+                      <NativeSelect size="sm" id={`role-${m.id}`} value={m.role} onChange={(e) => setMembers((list) => list.map((x) => (x.id === m.id ? { ...x, role: e.target.value as Member["role"] } : x)))}>
                         <option>Member</option><option>Admin</option>
-                      </select>
-                      <Button variant="ghost" size="icon-sm" aria-label={`Remove ${m.name}`} onClick={() => {
+                      </NativeSelect>
+                      <Button variant="ghost" size="icon-sm" aria-label={m.pending ? `Cancel invite to ${m.email}` : `Remove ${m.name}`} title={m.pending ? "Cancel invite" : "Remove from team"} onClick={() => {
                         setMembers((list) => list.filter((x) => x.id !== m.id));
-                        toast(`${m.name} removed`, { action: { label: "Undo", onClick: () => setMembers((list) => [...list, m]) } });
+                        toast(m.pending ? `Invite to ${m.email} cancelled` : `${m.name} removed from ${ws.name}`, { action: { label: "Undo", onClick: () => setMembers((list) => [...list, m]) } });
                       }}>
                         <X />
                       </Button>
-                    </>
+                    </span>
                   )}
                 </li>
               );
@@ -244,6 +238,8 @@ function WorkspaceTab() {
           </ul>
         </Card>
       </Row>
+      <InviteDialog open={inviting} onOpenChange={setInviting} onPreview={setPreview} />
+      <InviteEmailPreview member={preview} onOpenChange={(v) => !v && setPreview(null)} />
     </>
   );
 }
@@ -382,10 +378,9 @@ function NotificationsTab() {
         <Card className="flex flex-col gap-4 p-5 md:flex-row md:items-end md:justify-between md:p-6">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="digest-day" className="text-[13px] font-medium">Send it every</label>
-            <select id="digest-day" value={day} onChange={(e) => store.set({ digestDay: e.target.value })}
-              className="h-9 w-48 rounded-lg border border-input bg-card px-3 text-[14px] hover:border-border-hover focus:border-primary focus:outline-none">
+            <NativeSelect id="digest-day" value={day} onChange={(e) => store.set({ digestDay: e.target.value })} className="w-48">
               {DAYS.map((d) => <option key={d}>{d}</option>)}
-            </select>
+            </NativeSelect>
             <span className="text-caption text-muted-foreground">at 9:00, your time</span>
           </div>
           <Button variant="secondary" onClick={() => setPreview(true)}>Preview digest</Button>

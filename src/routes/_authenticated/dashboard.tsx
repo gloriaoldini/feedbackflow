@@ -204,14 +204,14 @@ function answerFor(q: string, items: FeedbackItem[]) {
     const [topic, list] = Object.entries(byTopic).sort((a, b) => b[1].length - a[1].length)[0] ?? [];
     if (!topic) return { text: "No complaints in this period.", refs: [] };
     return {
-      text: `${neg.length} negative messages. The biggest theme is ${TOPIC_LABEL[topic as keyof typeof TOPIC_LABEL].toLowerCase()} (${list.length}), led by API rate limits: ${list.filter((i) => i.urgency === "high").length} of them are urgent.`,
+      text: `${neg.length} negative messages. The biggest theme is ${TOPIC_LABEL[topic as keyof typeof TOPIC_LABEL].toLowerCase()} (${list.length}), for example "${list[0].summary.toLowerCase()}". ${list.filter((i) => i.urgency === "high").length} of them are urgent.`,
       refs: list.slice(0, 4),
     };
   }
   if (/request|impact|feature|build/.test(s)) {
     const fr = items.filter((i) => i.is_feature_request);
     return {
-      text: `${fr.length} messages are feature requests. Dark mode, higher API limits and Slack alerts are mentioned most; API limits carry the most urgency.`,
+      text: `${fr.length} messages are feature requests. The most urgent: "${(fr.find((i) => i.urgency === "high") ?? fr[0])?.summary.toLowerCase() ?? "none yet"}". See Top requests for the full ranking.`,
       refs: fr.filter((i) => i.urgency !== "low").slice(0, 4),
     };
   }

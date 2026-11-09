@@ -48,9 +48,9 @@ export const WORKSPACES: Workspace[] = [
 ];
 
 export const DEMO_PROJECTS: Project[] = [
-  { id: "web", workspaceId: "acme", name: "Web App", color: "coral", description: "The main SaaS dashboard" },
+  { id: "web", workspaceId: "acme", name: "Web App", color: "blue", description: "The main SaaS dashboard" },
   { id: "mobile", workspaceId: "acme", name: "Mobile App", color: "violet", description: "iOS and Android apps" },
-  { id: "api", workspaceId: "acme", name: "Public API", color: "blue", description: "REST API and webhooks" },
+  { id: "api", workspaceId: "acme", name: "Help Center", color: "amber", description: "Docs and support articles" },
   { id: "insights-hub", workspaceId: "northwind", name: "Insights Hub", color: "teal", description: "Analytics product" },
 ];
 
@@ -70,10 +70,10 @@ export const DEMO_CONFIG: Record<string, ProjectConfig> = {
     routing: { slackChannels: ["#mobile-feedback"], intercomTag: "mobile", gmailAlias: "mobile" },
   },
   api: {
-    connected: { ...ALL_OFF, intercom: true, gmail: true, jira: true, github: true },
+    connected: { ...ALL_OFF, intercom: true, gmail: true, jira: true },
     defaultDest: "jira",
-    destKey: "API",
-    routing: { slackChannels: [], intercomTag: "api", gmailAlias: "api" },
+    destKey: "DOCS",
+    routing: { slackChannels: [], intercomTag: "help-center", gmailAlias: "help" },
   },
   "insights-hub": {
     connected: { ...ALL_OFF, slack: true, jira: true },

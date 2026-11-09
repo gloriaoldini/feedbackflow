@@ -89,8 +89,8 @@ function AppShell() {
 
       {/* Sidebar: full on desktop, icon rail on tablet */}
       <aside className="sticky top-0 hidden h-screen w-[72px] shrink-0 flex-col border-r border-border bg-sidebar md:flex lg:w-60">
-        <Link to="/dashboard" className="hidden h-14 items-center px-5 lg:flex" aria-label="FeedBackFlow home">
-          <Logo size={26} />
+        <Link to="/dashboard" className="mb-3 mt-1 hidden h-14 items-center px-5 lg:flex" aria-label="FeedBackFlow home">
+          <Logo size={22} />
         </Link>
         <div className="flex flex-col items-center gap-2 px-3 pt-4 lg:hidden">
           <div data-tour="switcher"><ProjectSwitcher variant="rail" /></div>

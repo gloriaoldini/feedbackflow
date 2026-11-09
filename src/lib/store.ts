@@ -16,6 +16,9 @@ export interface Member {
   email: string;
   role: "Admin" | "Member";
   pending?: boolean;
+  /** ISO date the invite was (last) sent. */
+  invitedAt?: string;
+  message?: string;
 }
 
 export interface AppState {

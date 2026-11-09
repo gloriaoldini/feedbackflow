@@ -7,7 +7,7 @@
 ## Try it
 
 - **Landing page:** `/` (on GitHub Pages: `https://<your-user>.github.io/<repo>/`)
-- **Live demo:** `/demo`. No sign-up: it opens a demo workspace with sample data from 3 products (Web App, Mobile App, Public API) plus a second workspace (Northwind Labs).
+- **Live demo:** `/demo`. No sign-up: it opens a demo team (Acme Inc) with sample data from 3 products (Web App, Mobile App, Help Center) plus a second team (Northwind Labs).
 
 The demo is fully navigable. You can:
 
@@ -16,7 +16,7 @@ The demo is fully navigable. You can:
 - Open feedback, edit the AI summary and send it to Jira or Linear (simulated), with undo.
 - Filter, search, favourite, archive and reply in the Inbox.
 - Switch product or team from the sidebar menu (each team lists its products), or add a new product and connect its sources.
-- Manage the team and invite members (Settings → Team).
+- Manage the team and invite members (Settings → Team → Invite people). Preview the invite email and open the join page the invited person sees (`/join`).
 - Manage integrations per product (source routing, default destination).
 - Use Settings (profile, workspace, projects, notifications, appearance, billing).
 - Switch between light, dark and system themes.

@@ -6,13 +6,13 @@ import { applyTheme, resolveTheme, store, useApp } from "@/lib/store";
 import logoUrl from "@/assets/logo-256.png";
 
 /* ---------- Brand ---------- */
-export function Logo({ size = 32, withText = true, sub }: { size?: number; withText?: boolean; sub?: string }) {
+export function Logo({ size = 28, withText = true, sub }: { size?: number; withText?: boolean; sub?: string }) {
   return (
-    <span className="flex items-center gap-2.5">
-      <img src={logoUrl} alt="" width={size} height={size} className="rounded-[9px]" style={{ width: size, height: size }} />
+    <span className="flex items-center gap-2">
+      <img src={logoUrl} alt="" width={size} height={size} className="rounded-[8px]" style={{ width: size, height: size }} />
       {withText && (
         <span className="flex flex-col leading-tight">
-          <span className="text-[15px] font-semibold tracking-[-0.01em] text-foreground">FeedBackFlow</span>
+          <span className="text-logo text-[15px] font-semibold tracking-[-0.01em]">FeedBackFlow</span>
           {sub && <span className="text-caption text-muted-foreground">{sub}</span>}
         </span>
       )}
