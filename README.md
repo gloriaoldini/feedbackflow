@@ -19,6 +19,10 @@ The demo is fully navigable. You can:
 - Manage integrations per project (source routing, default destination).
 - Use Settings (profile, workspace, projects, notifications, appearance, billing).
 - Switch between light, dark and system themes.
+- Press ⌘K / Ctrl+K to search messages, requests, pages and projects.
+- See which customers asked for the same thing (grouped requests).
+- Close the loop: mark a sent request as shipped and notify every customer who asked.
+- Set up and preview the weekly digest email (Settings → Notifications).
 
 All demo changes persist in `localStorage`.
 
@@ -28,10 +32,10 @@ All demo changes persist in `localStorage`.
 
 ## Design system
 
-- **Type:** Inter, with a fixed scale (`text-h1`, `text-h2`, `text-h3`, `text-body`, `text-caption`, `text-overline`, `text-kpi`). Instrument Serif italic is used for **one word per page title** only (`serif-accent`).
+- **Type:** Inter, with a fixed scale (`text-h1`, `text-h2`, `text-h3`, `text-body`, `text-caption`, `text-overline`, `text-kpi`). Instrument Serif italic is used for **one word per page title** only (`serif-accent`), filled with the logo gradient.
 - **Color:** warm cream, coral and amber. Every color is an `oklch` token in `src/styles.css`, with a full dark theme. Text meets WCAG AA (body 16:1, muted 6.2:1, white on coral 4.6:1).
 - **Fixed tag meanings:** topic = blue, positive = green, neutral = yellow, negative = pink-red, urgent = solid pink-red.
-- **Components:** one button family (primary / secondary / ghost / soft / destructive) with hover, active, focus and disabled states. Also a segmented control, tags, cards, inputs and a sun/moon theme switch.
+- **Components:** primary buttons use the logo gradient (coral → orange, white text ≥ 4.6:1); one button family (primary / secondary / ghost / soft / destructive) with hover, active, focus and disabled states. Also a segmented control, tags, cards, inputs and a sun/moon theme switch.
 - **Responsive:**
   - Desktop: full sidebar.
   - Tablet: icon rail.

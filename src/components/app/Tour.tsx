@@ -180,7 +180,7 @@ function ArtAsk() {
           <Sparkles className="size-3.5 text-white" />
         </span>
         <span className="flex-1 text-[13px]">Top complaints this week</span>
-        <span className="rounded-md bg-primary px-2.5 py-1.5 text-[12px] font-medium text-white">Ask AI</span>
+        <span className="rounded-md bg-primary bg-button px-2.5 py-1.5 text-[12px] font-medium text-white">Ask AI</span>
       </div>
       <div className={cn(mini, "px-3.5 py-2.5 text-[13px] leading-5 text-muted-foreground")}>
         <b className="font-semibold text-foreground">API rate limits</b> come up in 4 negative messages, 3 marked urgent.
@@ -224,7 +224,7 @@ function ArtFlow() {
         <span className="text-[12px] font-medium leading-4">Requests dark mode for late-night use</span>
       </div>
       <ArrowRight className="size-4 text-primary" />
-      <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-[12.5px] font-medium text-white">
+      <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary bg-button px-3 py-2 text-[12.5px] font-medium text-white">
         <Send className="size-3.5" /> Send to Jira
       </span>
     </div>

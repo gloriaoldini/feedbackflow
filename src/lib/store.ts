@@ -25,6 +25,9 @@ export interface AppState {
   sent: Record<string, Destination>;
   sentFeatures: Record<string, Destination>;
   notifications: Record<string, boolean>;
+  /** Close the loop: request id → number of customers notified when it shipped. */
+  shipped: Record<string, number>;
+  digestDay: string;
   topics: string[];
   /* workspaces & projects */
   workspaceId: string;
@@ -51,6 +54,8 @@ export const DEFAULTS: AppState = {
   sent: {},
   sentFeatures: {},
   notifications: { digest: true, urgent: true, trending: false },
+  shipped: {},
+  digestDay: "Monday",
   topics: ["feature request", "bug", "UX", "pricing"],
   workspaceId: "acme",
   projectId: "web",

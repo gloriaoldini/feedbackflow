@@ -14,7 +14,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-[0_1px_2px_oklch(0.4_0.15_20/0.25),inset_0_1px_0_oklch(1_0_0/0.14)] hover:bg-primary-hover",
+          "bg-primary bg-button text-primary-foreground shadow-button hover:[background-image:var(--gradient-button-hover)]",
         secondary: "bg-card text-foreground border-input shadow-card hover:bg-hover hover:border-border-hover",
         outline: "bg-card text-foreground border-input shadow-card hover:bg-hover hover:border-border-hover",
         ghost: "text-muted-foreground hover:bg-muted hover:text-foreground",

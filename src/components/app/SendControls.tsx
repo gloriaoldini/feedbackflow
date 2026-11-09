@@ -7,10 +7,12 @@ import { sendToTracker, undoSend } from "@/lib/data";
 import { useApp, type Destination } from "@/lib/store";
 import { useProjectConfig } from "@/lib/projects";
 import { StatusTag } from "./primitives";
+import { ShipButton, useAskers } from "./CloseLoop";
 
 /** Full send block used in the Inbox detail (step 3 of the key flow). */
 export function SendPanel({ id, disabled }: { id: string; disabled?: boolean }) {
   const sentTo = useApp((s) => s.sent[id]);
+  const { askers } = useAskers({ feedbackId: id });
   const { connected, defaultDest: def, destKey } = useProjectConfig();
   const [busy, setBusy] = useState<Destination | null>(null);
 
@@ -26,6 +28,7 @@ export function SendPanel({ id, disabled }: { id: string; disabled?: boolean }) 
 
   if (sentTo) {
     return (
+      <div className="flex flex-col gap-2.5">
       <div role="status" className="flex flex-wrap items-center gap-3 rounded-xl border border-pos-bd bg-pos-bg px-3.5 py-3">
         <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-chart-pos">
           <Check className="size-4 text-white" strokeWidth={2.5} aria-hidden="true" />
@@ -37,6 +40,11 @@ export function SendPanel({ id, disabled }: { id: string; disabled?: boolean }) 
         <Button variant="ghost" size="sm" className="text-pos-fg hover:bg-pos-bd/40 hover:text-pos-strong" onClick={() => undoSend("feedback", id)}>
           Undo
         </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <ShipButton feedbackId={id} />
+        <span className="text-caption text-muted-foreground">When it's live, tell everyone who asked.</span>
+      </div>
       </div>
     );
   }
@@ -68,7 +76,11 @@ export function SendPanel({ id, disabled }: { id: string; disabled?: boolean }) 
           </Link>
         </Button>
       </div>
-      <p className="text-caption text-muted-foreground">Creates an issue with the summary, tags and a link back to this message.</p>
+      <p className="text-caption text-muted-foreground">
+        {askers.length > 1
+          ? `Creates one issue for this request and links all ${askers.length} messages that ask for it.`
+          : "Creates an issue with the summary, tags and a link back to this message."}
+      </p>
     </div>
   );
 }
@@ -82,7 +94,13 @@ export function SendFeatureButton({ id, name }: { id: string; name: string }) {
   const [busy, setBusy] = useState(false);
   const dest: Destination = def === "linear" ? "Linear" : "Jira";
 
-  if (sentTo) return <StatusTag><Check className="size-3" strokeWidth={2.5} aria-hidden="true" /> In {sentTo}</StatusTag>;
+  if (sentTo)
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <StatusTag><Check className="size-3" strokeWidth={2.5} aria-hidden="true" /> In {sentTo}</StatusTag>
+        <ShipButton featureId={id} compact />
+      </span>
+    );
   if (!connected)
     return (
       <Button asChild size="sm" variant="secondary">

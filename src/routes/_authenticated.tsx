@@ -7,6 +7,7 @@ import { Avatar, Logo, Skeleton, ThemeToggle } from "@/components/app/primitives
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ProjectSwitcher } from "@/components/app/ProjectSwitcher";
+import { CommandMenu, SearchTrigger } from "@/components/app/CommandMenu";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
@@ -79,6 +80,7 @@ function AppShell() {
         <div className="min-w-0 flex-1">
           <ProjectSwitcher variant="topbar" />
         </div>
+        <SearchTrigger variant="icon" />
         <ThemeToggle variant="header" />
         <Link to="/settings" aria-label="Your settings" className="rounded-full focus-visible:outline-none focus-visible:focus-ring">
           <Avatar name={name} brand />
@@ -90,11 +92,13 @@ function AppShell() {
         <Link to="/dashboard" className="hidden h-14 items-center px-5 lg:flex" aria-label="FeedBackFlow home">
           <Logo size={26} />
         </Link>
-        <div className="flex justify-center px-3 pt-4 lg:hidden">
+        <div className="flex flex-col items-center gap-2 px-3 pt-4 lg:hidden">
           <ProjectSwitcher variant="rail" />
+          <SearchTrigger variant="icon" />
         </div>
-        <div className="hidden px-3 lg:block">
+        <div className="hidden flex-col gap-2 px-3 lg:flex">
           <ProjectSwitcher variant="sidebar" />
+          <SearchTrigger variant="sidebar" />
         </div>
         <nav aria-label="Main" className="flex flex-col gap-0.5 p-3">
           {NAV.map((item) => {
@@ -152,6 +156,7 @@ function AppShell() {
         <main className="mx-auto w-full max-w-[1200px] px-4 pb-28 pt-5 md:px-7 md:pb-12 md:pt-8 lg:px-10 lg:pt-10">
           {/* App pages show live, time-relative data: render them in the browser only. */}
           {hydrated ? <Outlet /> : <PageSkeleton />}
+          {hydrated && <CommandMenu />}
         </main>
       </div>
 

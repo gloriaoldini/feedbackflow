@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { Archive, CheckCheck, ChevronLeft, CornerUpLeft, Inbox as InboxIcon, Pencil, Search, SlidersHorizontal, Sparkles, Star } from "lucide-react";
+import { Archive, CheckCheck, ChevronLeft, CornerUpLeft, Inbox as InboxIcon, Layers, Pencil, Search, SlidersHorizontal, Sparkles, Star } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,8 +10,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, EmptyState, PageHeader, Segmented, SentimentTag, Skeleton, SourceIcon, TopicTag, UrgentTag } from "@/components/app/primitives";
 import { SendPanel } from "@/components/app/SendControls";
-import { useFeedback } from "@/lib/data";
-import { SOURCE_LABEL, TOPIC_LABEL, timeAgo, timeAgoLong, type FeedbackItem, type Source, type Topic } from "@/lib/demo-data";
+import { useFeatures, useFeedback } from "@/lib/data";
+import { askersOf, featureFor, SOURCE_LABEL, TOPIC_LABEL, timeAgo, timeAgoLong, type FeedbackItem, type Source, type Topic } from "@/lib/demo-data";
 import { store, toggleIn, useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +34,12 @@ function InboxPage() {
   const navigate = useNavigate({ from: "/inbox" });
   const filter: Filter = search.filter ?? "all";
   const { data: items = [], isLoading } = useFeedback();
+  const { data: features = [] } = useFeatures();
+  const groupSize = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const it of items) { const f = featureFor(it, features); if (f) m[it.id] = askersOf(f, items).length; }
+    return m;
+  }, [items, features]);
   const favourites = useApp((s) => s.favourites);
   const archived = useApp((s) => s.archived);
   const [query, setQuery] = useState("");
@@ -143,6 +149,11 @@ function InboxPage() {
                   <span className="flex flex-wrap gap-1.5">
                     <SentimentTag value={it.sentiment} />
                     <TopicTag value={it.topic} />
+                    {(groupSize[it.id] ?? 0) > 1 && (
+                      <span className="inline-flex h-[22px] items-center gap-1 rounded-full border border-border bg-muted px-2 text-[12px] font-medium text-ink-3">
+                        <Layers className="size-3" aria-hidden="true" /> +{groupSize[it.id] - 1} similar
+                      </span>
+                    )}
                   </span>
                 </button>
               );
@@ -152,7 +163,7 @@ function InboxPage() {
 
         {/* Detail */}
         <Card className={cn("min-h-0 overflow-y-auto", !search.id && "max-md:hidden")} aria-label="Feedback detail">
-          {active ? <Detail key={active.id} item={active} onBack={() => select(undefined)} /> : (
+          {active ? <Detail key={active.id} item={active} onBack={() => select(undefined)} onOpen={(id) => select(id)} /> : (
             <EmptyState icon={InboxIcon} title="Select a message" body="Pick a message to see its AI summary and send it to your tracker." />
           )}
         </Card>
@@ -225,7 +236,7 @@ function Step({ n, tone, label, children, last }: { n: React.ReactNode; tone: "i
   );
 }
 
-function Detail({ item, onBack }: { item: FeedbackItem; onBack: () => void }) {
+function Detail({ item, onBack, onOpen }: { item: FeedbackItem; onBack: () => void; onOpen: (id: string) => void }) {
   const fav = useApp((s) => s.favourites.includes(item.id));
   const isArchived = useApp((s) => s.archived.includes(item.id));
   const addressed = useApp((s) => s.addressed.includes(item.id));
@@ -332,12 +343,43 @@ function Detail({ item, onBack }: { item: FeedbackItem; onBack: () => void }) {
               {edited !== undefined ? "Edited by you · used as the issue description" : "Generated from this message · edit before sending if needed"}
             </p>
           </div>
+          <SameRequest item={item} onOpen={onOpen} />
         </Step>
 
         <Step n={sentTo ? "✓" : 3} tone={sentTo ? "done" : "todo"} last label={<span className="text-overline text-muted-foreground">Send to your tracker</span>}>
           <SendPanel id={item.id} disabled={editing} />
         </Step>
       </ol>
+    </div>
+  );
+}
+
+/** Duplicate grouping: other customers who asked for the same thing. */
+function SameRequest({ item, onOpen }: { item: FeedbackItem; onOpen: (id: string) => void }) {
+  const { data: items = [] } = useFeedback();
+  const { data: features = [] } = useFeatures();
+  const feature = featureFor(item, features);
+  if (!feature) return null;
+  const others = askersOf(feature, items).filter((i) => i.id !== item.id);
+  if (!others.length) return null;
+  return (
+    <div className="flex flex-col gap-2.5 rounded-xl border border-border px-4 py-3.5">
+      <p className="flex items-center gap-2 text-[13px]">
+        <Layers className="size-4 text-ink-subtle" aria-hidden="true" />
+        <span>
+          Same request as <b className="font-semibold">{others.length} other {others.length === 1 ? "customer" : "customers"}</b> · <span className="text-muted-foreground">{feature.topic_name}</span>
+        </span>
+      </p>
+      <ul className="flex flex-wrap gap-1.5">
+        {others.map((o) => (
+          <li key={o.id}>
+            <button onClick={() => onOpen(o.id)} className="inline-flex h-7 items-center gap-1.5 rounded-full border border-border bg-card pl-1 pr-2.5 text-[12.5px] font-medium hover:border-border-hover hover:bg-hover focus-visible:outline-none focus-visible:focus-ring">
+              <Avatar name={o.author} size={20} />
+              {o.author}
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

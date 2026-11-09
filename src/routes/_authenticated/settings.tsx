@@ -12,6 +12,7 @@ import { Avatar, PageHeader, Segmented, StatusTag, useTheme } from "@/components
 import { ProjectMark } from "@/components/app/ProjectSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { isDemoMode } from "@/lib/data";
+import { DEMO_FEATURES, demoFeedback } from "@/lib/demo-data";
 import { COLOR_CLASS, PROJECT_COLORS, useCurrentProject, useProjects, useWorkspace, type Project } from "@/lib/projects";
 import { store, useApp } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -281,10 +282,15 @@ const NOTIFS = [
   ["trending", "New feature requests", "Tell me when a new theme starts trending."],
 ] as const;
 
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
 function NotificationsTab() {
   const n = useApp((s) => s.notifications);
   const email = useApp((s) => s.email);
+  const day = useApp((s) => s.digestDay);
+  const [preview, setPreview] = useState(false);
   return (
+    <>
     <Row title="Email notifications" sub={`Sent to ${email}.`}>
       <Card className="divide-y divide-border overflow-hidden">
         {NOTIFS.map(([k, title, desc]) => (
@@ -298,6 +304,65 @@ function NotificationsTab() {
         ))}
       </Card>
     </Row>
+    {n.digest && (
+      <Row title="Weekly digest" sub="One email per workspace with every project's numbers, top request and what needs attention.">
+        <Card className="flex flex-col gap-4 p-5 md:flex-row md:items-end md:justify-between md:p-6">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="digest-day" className="text-[13px] font-medium">Send it every</label>
+            <select id="digest-day" value={day} onChange={(e) => store.set({ digestDay: e.target.value })}
+              className="h-9 w-48 rounded-lg border border-input bg-card px-3 text-[14px] hover:border-border-hover focus:border-primary focus:outline-none">
+              {DAYS.map((d) => <option key={d}>{d}</option>)}
+            </select>
+            <span className="text-caption text-muted-foreground">at 9:00, your time</span>
+          </div>
+          <Button variant="secondary" onClick={() => setPreview(true)}>Preview digest</Button>
+        </Card>
+      </Row>
+    )}
+    <DigestPreview open={preview} onOpenChange={setPreview} day={day} />
+    </>
+  );
+}
+
+function DigestPreview({ open, onOpenChange, day }: { open: boolean; onOpenChange: (v: boolean) => void; day: string }) {
+  const ws = useWorkspace();
+  const projects = useProjects();
+  const email = useApp((s) => s.email);
+  const name = useApp((s) => s.profileName);
+  const rows = projects.map((p) => {
+    const fb = demoFeedback().filter((f) => f.project_id === p.id);
+    const top = DEMO_FEATURES.filter((f) => f.project_id === p.id)[0];
+    const pos = fb.length ? Math.round((fb.filter((f) => f.sentiment === "positive").length / fb.length) * 100) : 0;
+    return { p, n: fb.length, pos, urgent: fb.filter((f) => f.urgency === "high").length, top };
+  });
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Weekly digest preview</DialogTitle>
+          <DialogDescription>Arrives every {day} at 9:00 in {email}.</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-4 rounded-xl border border-border bg-background p-4 md:p-5">
+          <p className="text-overline text-muted-foreground">FeedBackFlow · {ws.name}</p>
+          <p className="text-h2">Your week in <em className="serif-accent">feedback</em></p>
+          <p className="text-muted-foreground">Hi {name.split(" ")[0]}, here's what customers said across {rows.length} {rows.length === 1 ? "project" : "projects"}.</p>
+          <ul className="flex flex-col gap-2">
+            {rows.map(({ p, n, pos, urgent, top }) => (
+              <li key={p.id} className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3.5">
+                <span className="flex items-center gap-2"><ProjectMark project={p} size={20} /><b className="font-semibold">{p.name}</b></span>
+                <span className="tabular text-[13px] text-muted-foreground">{n} messages · {pos}% positive · {urgent} urgent</span>
+                {top ? <span className="text-[13px]">Top request: <b className="font-semibold">{top.topic_name}</b> ({top.mention_count} mentions)</span> : <span className="text-[13px] text-muted-foreground">No requests yet</span>}
+              </li>
+            ))}
+          </ul>
+          <span className="self-start rounded-lg bg-primary bg-button px-3 py-2 text-[13px] font-medium text-white">Open dashboard</span>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Close</Button>
+          <Button onClick={() => { onOpenChange(false); toast.success(`Test digest sent to ${email}`); }}>Send me a test</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

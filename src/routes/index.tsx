@@ -152,7 +152,7 @@ function Landing() {
             { name: "Business", price: 299, features: ["Unlimited projects", "Unlimited sources", "Unlimited feedback", "Custom AI prompts", "SAML SSO", "Dedicated CSM"] },
           ].map((t) => (
             <div key={t.name} className={cn("relative flex flex-col rounded-2xl border bg-card p-7 shadow-card", t.popular ? "border-primary shadow-[0_0_0_3px_oklch(0.586_0.192_20/0.12)]" : "border-border")}>
-              {t.popular && <span className="absolute -top-3 left-7 rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-white">Most popular</span>}
+              {t.popular && <span className="absolute -top-3 left-7 rounded-full bg-primary bg-button px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-white">Most popular</span>}
               <h3 className="text-h2">{t.name}</h3>
               <p className="mb-6 mt-2"><span className="text-[44px] font-semibold tracking-[-0.03em]">${t.price}</span><span className="text-muted-foreground"> / month</span></p>
               <ul className="mb-8 flex flex-col gap-2.5">

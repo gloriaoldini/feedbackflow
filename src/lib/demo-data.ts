@@ -77,9 +77,9 @@ const NORTHWIND: [Source, string, string, Sentiment, Topic, Urgency, boolean, st
 
 /** Which Acme project each seed message belongs to (by index). */
 const PROJECT_OF = [
-  "web", "api", "mobile", "web", "web", "web", "mobile", "api", "web", "web",
-  "web", "api", "api", "web", "mobile", "mobile", "web", "api", "web", "mobile",
-  "mobile", "web", "api", "api", "mobile", "web", "web", "web", "api", "web",
+  "web", "api", "web", "web", "web", "web", "web", "api", "web", "web",
+  "web", "api", "api", "web", "mobile", "web", "web", "api", "web", "mobile",
+  "web", "web", "api", "api", "mobile", "web", "web", "web", "web", "web",
 ];
 
 /** Spread the demo items over the last 14 days (newest first) so trends read naturally. */
@@ -156,4 +156,29 @@ export function timeAgoLong(iso: string, now = Date.now()) {
 
 export function initials(name: string) {
   return name.split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase();
+}
+
+/** Which messages ask for the same thing (AI clustering, rule-based in the demo). */
+const FEATURE_MATCH: Record<string, RegExp> = {
+  "Dark mode": /dark mode/i,
+  "Slack notifications": /slack (notification|alert|integration for alert)/i,
+  "SAML SSO": /\bsso\b|saml/i,
+  "Date range filters": /date range/i,
+  "API rate limit increase": /rate limit|api limit|429/i,
+  "Jira export": /jira/i,
+  "Sentiment webhooks": /webhook/i,
+  "Push notifications": /push notification/i,
+  "Native mobile app": /mobile app/i,
+  "Public share links": /share link|public link/i,
+  "Full CSV export": /csv/i,
+  "Dark mode for dashboards": /dark mode/i,
+};
+
+export function featureFor(item: FeedbackItem, features: FeatureRequest[]) {
+  return features.find((f) => f.project_id === item.project_id && FEATURE_MATCH[f.topic_name]?.test(item.original_text));
+}
+
+/** Messages grouped under a feature request. */
+export function askersOf(feature: FeatureRequest, items: FeedbackItem[]) {
+  return items.filter((i) => i.project_id === feature.project_id && FEATURE_MATCH[feature.topic_name]?.test(i.original_text));
 }
