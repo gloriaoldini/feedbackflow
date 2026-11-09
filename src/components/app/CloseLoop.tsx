@@ -45,7 +45,7 @@ export function ShipButton({ feedbackId, featureId, compact }: { feedbackId?: st
     );
 
   const openDialog = () => {
-    setMsg(`Good news: ${name.toLowerCase()} is now live! Thanks for asking for it. Your feedback helped us decide what to build next.`);
+    setMsg(`Good news: we just shipped ${name}! Thanks for asking for it. Your feedback helped us decide what to build next.`);
     setOpen(true);
   };
   const channels = [...new Set(askers.map((a) => SOURCE_LABEL[a.source]))];
@@ -60,7 +60,7 @@ export function ShipButton({ feedbackId, featureId, compact }: { feedbackId?: st
           <DialogHeader>
             <DialogTitle>Tell customers it shipped</DialogTitle>
             <DialogDescription>
-              {askers.length} {askers.length === 1 ? "customer" : "customers"} asked for {name.toLowerCase()}. Each gets a reply on the channel they used.
+              {askers.length} {askers.length === 1 ? "customer" : "customers"} asked for {name}. Each gets a reply on the channel they used.
             </DialogDescription>
           </DialogHeader>
           <ul className="flex max-h-48 flex-col gap-1 overflow-y-auto rounded-xl border border-border p-1.5">
