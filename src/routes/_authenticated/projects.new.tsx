@@ -108,7 +108,7 @@ function NewProject() {
               </div>
             </fieldset>
             <fieldset className="flex flex-col gap-2">
-              <legend className="mb-2 text-[13px] font-medium">Workspace</legend>
+              <legend className="mb-2 text-[13px] font-medium">Team</legend>
               <div className="grid gap-2 sm:grid-cols-2">
                 {WORKSPACES.map((w) => (
                   <label key={w.id} className={cn("flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-colors", workspaceId === w.id ? "border-primary bg-primary-soft/50" : "border-input hover:border-border-hover")}>

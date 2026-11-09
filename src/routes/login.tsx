@@ -122,7 +122,7 @@ function LoginPage() {
                 </h1>
                 <p className="text-[15px] text-muted-foreground">
                   {mode === "signup" && "14 days of Pro, no card required."}
-                  {mode === "signin" && "Sign in to your workspace."}
+                  {mode === "signin" && "Sign in to your team."}
                   {mode === "forgot" && "Enter your work email and we'll send you a reset link."}
                 </p>
               </div>

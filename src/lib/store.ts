@@ -10,6 +10,14 @@ export type Theme = "light" | "dark" | "system";
 export type Destination = "Jira" | "Linear";
 export type IntegrationId = "slack" | "intercom" | "gmail" | "jira" | "linear" | "github" | "figma";
 
+export interface Member {
+  id: string;
+  name: string;
+  email: string;
+  role: "Admin" | "Member";
+  pending?: boolean;
+}
+
 export interface AppState {
   demo: boolean;
   onboarded: boolean;
@@ -27,6 +35,8 @@ export interface AppState {
   notifications: Record<string, boolean>;
   /** Close the loop: request id → number of customers notified when it shipped. */
   shipped: Record<string, number>;
+  /** Team (workspace) id → people who can see its products. */
+  members: Record<string, Member[]>;
   digestDay: string;
   topics: string[];
   /* workspaces & projects */
@@ -55,6 +65,18 @@ export const DEFAULTS: AppState = {
   sentFeatures: {},
   notifications: { digest: true, urgent: true, trending: false },
   shipped: {},
+  members: {
+    acme: [
+      { id: "m-you", name: "Jane Doe", email: "jane@company.com", role: "Admin" },
+      { id: "m-2", name: "Sam Lee", email: "sam@company.com", role: "Member" },
+      { id: "m-3", name: "Priya Nair", email: "priya@company.com", role: "Member" },
+      { id: "m-4", name: "Tom Berg", email: "tom@company.com", role: "Member", pending: true },
+    ],
+    northwind: [
+      { id: "m-you", name: "Jane Doe", email: "jane@company.com", role: "Admin" },
+      { id: "m-5", name: "Lena Vos", email: "lena@northwind.io", role: "Admin" },
+    ],
+  },
   digestDay: "Monday",
   topics: ["feature request", "bug", "UX", "pricing"],
   workspaceId: "acme",

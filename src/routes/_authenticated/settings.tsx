@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { Check, Lock, Plus } from "lucide-react";
+import { Check, Lock, Plus, UserPlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,8 +13,8 @@ import { ProjectMark } from "@/components/app/ProjectSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { isDemoMode } from "@/lib/data";
 import { DEMO_FEATURES, demoFeedback } from "@/lib/demo-data";
-import { COLOR_CLASS, PROJECT_COLORS, WORKSPACES, switchWorkspace, useCurrentProject, useProjects, useWorkspace, type Project } from "@/lib/projects";
-import { store, useApp } from "@/lib/store";
+import { COLOR_CLASS, PROJECT_COLORS, useCurrentProject, useProjects, useWorkspace, type Project } from "@/lib/projects";
+import { store, useApp, type Member } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const TABS = ["profile", "workspace", "projects", "notifications", "appearance", "billing"] as const;
@@ -26,14 +26,14 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-const LABEL: Record<Tab, string> = { profile: "Profile", workspace: "Workspace", projects: "Products", notifications: "Notifications", appearance: "Appearance", billing: "Billing" };
+const LABEL: Record<Tab, string> = { profile: "Profile", workspace: "Team", projects: "Products", notifications: "Notifications", appearance: "Appearance", billing: "Billing" };
 
 function SettingsPage() {
   const { tab = "profile" } = Route.useSearch();
   const navigate = useNavigate({ from: "/settings" });
   return (
     <div className="mx-auto flex w-full max-w-[1000px] flex-col gap-6 animate-fade-up">
-      <PageHeader title="Your" accent="settings" sub="Manage your profile, workspace, products and billing." />
+      <PageHeader title="Your" accent="settings" sub="Manage your profile, team, products and billing." />
       <Segmented label="Settings sections" value={tab} onChange={(t) => navigate({ search: { tab: t } })} items={TABS.map((t) => ({ value: t, label: LABEL[t] }))} />
       <div className="flex flex-col">
         {tab === "profile" && <ProfileTab />}
@@ -101,7 +101,7 @@ function ProfileTab() {
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="em" className="text-[13px] font-medium">Email</label>
                 <Input id="em" value={email} disabled aria-describedby="em-help" />
-                <span id="em-help" className="flex items-center gap-1.5 text-caption text-muted-foreground"><Lock className="size-3" aria-hidden="true" /> Ask a workspace admin to change your email.</span>
+                <span id="em-help" className="flex items-center gap-1.5 text-caption text-muted-foreground"><Lock className="size-3" aria-hidden="true" /> Ask a team admin to change your email.</span>
               </div>
             </div>
           </div>
@@ -145,52 +145,105 @@ function ProfileTab() {
 function WorkspaceTab() {
   const ws = useWorkspace();
   const slug = useApp((s) => s.workspaceSlug);
+  const members = useApp((s) => s.members[ws.id] ?? []);
+  const myEmail = useApp((s) => s.email);
+  const products = useProjects();
   const [name, setName] = useState(ws.name);
   const [s, setS] = useState(slug);
+  const [invite, setInvite] = useState("");
+  const [role, setRole] = useState<Member["role"]>("Member");
   useEffect(() => setName(ws.name), [ws.name]);
-  const names = useApp((st) => st.workspaceNames);
+  const validInvite = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(invite.trim());
+  const setMembers = (fn: (m: Member[]) => Member[]) => store.set((st) => ({ members: { ...st.members, [ws.id]: fn(st.members[ws.id] ?? []) } }));
+
   return (
     <>
-    <Row title="Workspace" sub="Your team or company. It holds all the products you monitor (website, app, software…) and shares billing and members.">
-      <Card className="flex flex-col gap-5 p-5 md:p-6">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="ws" className="text-[13px] font-medium">Workspace name</label>
-          <Input id="ws" value={name} onChange={(e) => setName(e.target.value)} />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="slug" className="text-[13px] font-medium">Workspace URL</label>
-          <div className="flex items-stretch overflow-hidden rounded-lg border border-input bg-card focus-within:border-primary">
-            <span className="flex items-center whitespace-nowrap border-r border-input bg-muted px-3 text-[14px] text-muted-foreground">feedbackflow.app/</span>
-            <input id="slug" value={s} onChange={(e) => setS(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} className="h-10 min-w-0 flex-1 bg-transparent px-3 text-[14px] focus:outline-none" />
+      <Row title="Team" sub={`The people and products of your company or team. ${ws.name} has ${products.length} ${products.length === 1 ? "product" : "products"}.`}>
+        <Card className="flex flex-col gap-5 p-5 md:p-6">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="ws" className="text-[13px] font-medium">Team name</label>
+            <Input id="ws" value={name} onChange={(e) => setName(e.target.value)} />
+            <span className="text-caption text-muted-foreground">Shown above the product name in the sidebar.</span>
           </div>
-        </div>
-        <div className="flex justify-end">
-          <Button
-            disabled={name.trim() === ws.name && s === slug}
-            onClick={() => { store.set((st) => ({ workspaceNames: { ...st.workspaceNames, [ws.id]: name.trim() || ws.name }, workspaceSlug: s })); toast.success("Workspace updated"); }}
-          >
-            Save workspace
-          </Button>
-        </div>
-      </Card>
-    </Row>
-    <Row title="Switch workspace" sub="Only if you work for more than one company. Each workspace has its own products and billing.">
-      <Card className="divide-y divide-border overflow-hidden">
-        {WORKSPACES.map((w) => (
-          <div key={w.id} className="flex items-center justify-between gap-4 p-4 md:px-6">
-            <div>
-              <p className="font-medium">{names[w.id] ?? w.name}</p>
-              <p className="text-caption text-muted-foreground">{w.plan} plan</p>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="slug" className="text-[13px] font-medium">Team URL</label>
+            <div className="flex items-stretch overflow-hidden rounded-lg border border-input bg-card focus-within:border-primary">
+              <span className="flex items-center whitespace-nowrap border-r border-input bg-muted px-3 text-[14px] text-muted-foreground">feedbackflow.app/</span>
+              <input id="slug" value={s} onChange={(e) => setS(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} className="h-10 min-w-0 flex-1 bg-transparent px-3 text-[14px] focus:outline-none" />
             </div>
-            {w.id === ws.id ? (
-              <StatusTag tone="brand"><Check className="size-3" aria-hidden="true" /> Current</StatusTag>
-            ) : (
-              <Button variant="secondary" size="sm" onClick={() => { switchWorkspace(w.id); toast(`Switched to ${names[w.id] ?? w.name}`); }}>Switch</Button>
-            )}
           </div>
-        ))}
-      </Card>
-    </Row>
+          <div className="flex justify-end">
+            <Button
+              disabled={name.trim() === ws.name && s === slug}
+              onClick={() => { store.set((st) => ({ workspaceNames: { ...st.workspaceNames, [ws.id]: name.trim() || ws.name }, workspaceSlug: s })); toast.success("Team updated"); }}
+            >
+              Save team
+            </Button>
+          </div>
+        </Card>
+      </Row>
+
+      <Row title="Members" sub="Everyone here sees all the team's products. Admins can add products, connect integrations and manage billing.">
+        <Card className="overflow-hidden">
+          <form
+            className="flex flex-col gap-2 border-b border-border p-4 sm:flex-row sm:items-end md:px-6"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!validInvite) return;
+              const email = invite.trim().toLowerCase();
+              if (members.some((m) => m.email === email)) { toast("Already in the team"); return; }
+              setMembers((m) => [...m, { id: `m-${Date.now()}`, name: email.split("@")[0], email, role, pending: true }]);
+              setInvite("");
+              toast.success(`Invite sent to ${email}`);
+            }}
+          >
+            <div className="flex flex-1 flex-col gap-1.5">
+              <label htmlFor="invite" className="text-[13px] font-medium">Invite by email</label>
+              <Input id="invite" type="email" placeholder="colleague@company.com" value={invite} onChange={(e) => setInvite(e.target.value)} />
+            </div>
+            <div className="flex gap-2">
+              <label htmlFor="invite-role" className="sr-only">Role</label>
+              <select id="invite-role" value={role} onChange={(e) => setRole(e.target.value as Member["role"])}
+                className="h-10 rounded-lg border border-input bg-card px-3 text-[14px] hover:border-border-hover focus:border-primary focus:outline-none">
+                <option>Member</option><option>Admin</option>
+              </select>
+              <Button type="submit" className="h-10" disabled={!validInvite}><UserPlus /> Invite</Button>
+            </div>
+          </form>
+          <ul className="divide-y divide-border">
+            {members.map((m) => {
+              const you = m.email === myEmail;
+              return (
+                <li key={m.id} className="flex items-center gap-3 px-4 py-3 md:px-6">
+                  <Avatar name={m.name} size={34} brand={you} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">{m.name}{you && <span className="font-normal text-muted-foreground"> (you)</span>}</p>
+                    <p className="truncate text-caption text-muted-foreground">{m.email}</p>
+                  </div>
+                  {m.pending && <span className="hidden h-[22px] items-center rounded-full border border-neu-bd bg-neu-bg px-2 text-[12px] font-medium text-neu-fg sm:inline-flex">Invite sent</span>}
+                  {you ? (
+                    <span className="text-[13px] text-muted-foreground">{m.role}</span>
+                  ) : (
+                    <>
+                      <label htmlFor={`role-${m.id}`} className="sr-only">Role of {m.name}</label>
+                      <select id={`role-${m.id}`} value={m.role} onChange={(e) => setMembers((list) => list.map((x) => (x.id === m.id ? { ...x, role: e.target.value as Member["role"] } : x)))}
+                        className="h-8 rounded-md border border-input bg-card px-2 text-[13px] hover:border-border-hover focus:border-primary focus:outline-none">
+                        <option>Member</option><option>Admin</option>
+                      </select>
+                      <Button variant="ghost" size="icon-sm" aria-label={`Remove ${m.name}`} onClick={() => {
+                        setMembers((list) => list.filter((x) => x.id !== m.id));
+                        toast(`${m.name} removed`, { action: { label: "Undo", onClick: () => setMembers((list) => [...list, m]) } });
+                      }}>
+                        <X />
+                      </Button>
+                    </>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+      </Row>
     </>
   );
 }
@@ -260,7 +313,7 @@ function EditProjectDialog({ project, onClose }: { project: Project; onClose: ()
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit product</DialogTitle>
-          <DialogDescription>Changes are visible to everyone in the workspace.</DialogDescription>
+          <DialogDescription>Changes are visible to everyone in the team.</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
@@ -325,7 +378,7 @@ function NotificationsTab() {
       </Card>
     </Row>
     {n.digest && (
-      <Row title="Weekly digest" sub="One email per workspace with every product's numbers, top request and what needs attention.">
+      <Row title="Weekly digest" sub="One email per team with every product's numbers, top request and what needs attention.">
         <Card className="flex flex-col gap-4 p-5 md:flex-row md:items-end md:justify-between md:p-6">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="digest-day" className="text-[13px] font-medium">Send it every</label>
@@ -415,7 +468,7 @@ function BillingTab() {
   const projects = useProjects();
   return (
     <>
-      <Row title="Plan" sub="Billed monthly per workspace. Cancel anytime.">
+      <Row title="Plan" sub="Billed monthly per team. Cancel anytime.">
         <Card className="flex flex-wrap items-start justify-between gap-4 p-5 md:p-6">
           <div className="flex flex-col gap-1">
             <span className="flex items-center gap-2"><span className="text-[20px] font-semibold tracking-[-0.015em]">{ws.plan}</span><StatusTag tone="brand">Current plan</StatusTag></span>

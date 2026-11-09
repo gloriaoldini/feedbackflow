@@ -119,7 +119,7 @@ function Dashboard() {
           {isLoading ? <Skeleton className="h-60" /> : <SentimentBars data={stats.series} height={240} label="Messages per day by sentiment, last 14 days" />}
         </Card>
 
-        <Card className="flex min-w-0 flex-col gap-4 p-5 md:p-6">
+        <Card data-tour="requests" className="flex min-w-0 flex-col gap-4 p-5 md:p-6">
           <SectionTitle
             title="Top requests"
             sub={`From ${stats.total} signals`}
@@ -149,7 +149,7 @@ function Dashboard() {
       </section>
 
       <Card className="overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4 md:px-6 md:py-5">
+        <div data-tour="recent" className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4 md:px-6 md:py-5">
           <SectionTitle title="Recent feedback" sub="Live from Slack, Intercom & Gmail" />
           <div className="flex gap-2">
             <Button asChild variant="ghost" size="sm">
@@ -245,7 +245,7 @@ function AskAI({ items }: { items: FeedbackItem[] }) {
   };
 
   return (
-    <section aria-label="Ask AI" className="rounded-2xl bg-[linear-gradient(120deg,oklch(0.82_0.09_5),oklch(0.83_0.09_40)_50%,oklch(0.88_0.09_75))] p-px shadow-[0_8px_24px_-12px_oklch(0.586_0.192_20/0.3)]">
+    <section data-tour="ask" aria-label="Ask AI" className="rounded-2xl bg-[linear-gradient(120deg,oklch(0.82_0.09_5),oklch(0.83_0.09_40)_50%,oklch(0.88_0.09_75))] p-px shadow-[0_8px_24px_-12px_oklch(0.586_0.192_20/0.3)]">
       <div className="flex flex-col gap-3 rounded-[15px] bg-card p-3 md:p-4">
         <form
           className="flex items-center gap-3"

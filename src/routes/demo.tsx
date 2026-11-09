@@ -18,7 +18,7 @@ function Demo() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-panel">
       <Logo />
-      <p className="text-muted-foreground">Opening the demo workspace…</p>
+      <p className="text-muted-foreground">Opening the demo…</p>
     </div>
   );
 }

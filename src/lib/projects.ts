@@ -1,8 +1,9 @@
 import { store, useApp, type IntegrationId } from "./store";
 
 /**
- * Workspace = company / billing. Project = one product with its own
- * inbox, insights, sources and Jira / Linear destination.
+ * Team (called "workspace" in the code) = company or team: members, billing.
+ * Project (shown as "product" in the UI) = one product with its own inbox,
+ * insights, sources and Jira / Linear destination.
  */
 export interface Workspace {
   id: string;
@@ -158,4 +159,21 @@ export function useProjectConfig(id?: string): ProjectConfig {
   const pid = id ?? current.id;
   const stored = useApp((s) => s.projectConfig[pid]);
   return stored ?? DEMO_CONFIG[pid] ?? emptyConfig();
+}
+
+/** Every team with its products: the hierarchy shown in the sidebar switcher. */
+export function useTeams() {
+  const custom = useApp((s) => s.customProjects);
+  const archived = useApp((s) => s.archivedProjects);
+  const renamed = useApp((s) => s.projectOverrides);
+  const names = useApp((s) => s.workspaceNames);
+  const members = useApp((s) => s.members);
+  return WORKSPACES.map((w) => ({
+    ...w,
+    name: names[w.id] ?? w.name,
+    members: members[w.id] ?? [],
+    products: [...DEMO_PROJECTS, ...custom]
+      .filter((p) => p.workspaceId === w.id && !archived.includes(p.id))
+      .map((p) => ({ ...p, ...renamed[p.id] })),
+  }));
 }

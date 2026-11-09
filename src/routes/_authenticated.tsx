@@ -78,7 +78,7 @@ function AppShell() {
       {/* Mobile top bar */}
       <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-border bg-sidebar/95 px-4 backdrop-blur md:hidden">
         <div className="min-w-0 flex-1">
-          <ProjectSwitcher variant="topbar" />
+          <div data-tour="switcher" className="min-w-0"><ProjectSwitcher variant="topbar" /></div>
         </div>
         <SearchTrigger variant="icon" />
         <ThemeToggle variant="header" />
@@ -93,11 +93,11 @@ function AppShell() {
           <Logo size={26} />
         </Link>
         <div className="flex flex-col items-center gap-2 px-3 pt-4 lg:hidden">
-          <ProjectSwitcher variant="rail" />
+          <div data-tour="switcher"><ProjectSwitcher variant="rail" /></div>
           <SearchTrigger variant="icon" />
         </div>
         <div className="hidden flex-col gap-2 px-3 lg:flex">
-          <ProjectSwitcher variant="sidebar" />
+          <div data-tour="switcher"><ProjectSwitcher variant="sidebar" /></div>
           <SearchTrigger variant="sidebar" />
         </div>
         <nav aria-label="Main" className="flex flex-col gap-0.5 p-3">
@@ -138,7 +138,7 @@ function AppShell() {
             <Avatar name={name} brand />
             <div className="hidden min-w-0 flex-1 lg:block">
               <p className="truncate text-[13px] font-medium leading-[18px]">{email}</p>
-              <p className="text-caption text-muted-foreground">{isDemoMode() ? "Demo workspace" : "Free trial · 12 days left"}</p>
+              <p className="text-caption text-muted-foreground">{isDemoMode() ? "Demo team" : "Free trial · 12 days left"}</p>
             </div>
             <button
               onClick={logout}
