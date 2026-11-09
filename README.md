@@ -11,11 +11,12 @@
 
 The demo is fully navigable. You can:
 
-- Follow onboarding, then the first-access guided tour.
+- Follow onboarding, then the first-access guided tour: each step opens next to the part of the page it explains.
 - Use Ask AI (rule-based in the demo).
 - Open feedback, edit the AI summary and send it to Jira or Linear (simulated), with undo.
 - Filter, search, favourite, archive and reply in the Inbox.
-- Switch between products (and workspaces in Settings), or add a new product and connect its sources.
+- Switch product or team from the sidebar menu (each team lists its products), or add a new product and connect its sources.
+- Manage the team and invite members (Settings → Team).
 - Manage integrations per product (source routing, default destination).
 - Use Settings (profile, workspace, projects, notifications, appearance, billing).
 - Switch between light, dark and system themes.
